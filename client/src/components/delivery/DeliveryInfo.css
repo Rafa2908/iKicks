@@ -1,0 +1,22 @@
+.user-name div input {
+  width: 204px;
+}
+
+.delivery-container main {
+  flex: 1;
+}
+
+.delivery-container aside {
+  flex: 1;
+  margin-top: 100px;
+}
+
+.shipping-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.delivery-container {
+  gap: 220px;
+}

@@ -1,0 +1,113 @@
+.item-img {
+  width: 100%;
+  height: 95px;
+  -o-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.main-container-1 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.main-container-2 {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.main-container-3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.main-container-4 {
+  display: flex;
+  align-items: center;
+}
+
+.icons-qty {
+  font-size: 1.6rem;
+}
+
+.qty-text {
+  font-size: 1.5rem;
+}
+
+.aside-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.subtotal {
+  display: flex;
+  justify-content: space-between;
+}
+
+.shipping {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.shipping p {
+  margin: 0;
+}
+
+.shipping-1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shipping-1 p {
+  margin: 0;
+}
+
+.estimated-taxes {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.total-order {
+  display: flex;
+  justify-content: space-between;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.cart-container {
+  gap: 50px;
+  width: 2000px;
+  margin-inline: auto;
+}
+
+.glass-aside {
+  padding: 30px 25px;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.item-gap {
+  gap: 40px;
+}

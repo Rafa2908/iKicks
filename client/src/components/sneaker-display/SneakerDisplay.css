@@ -1,0 +1,77 @@
+main {
+  flex: 3;
+  margin-top: 100px;
+}
+
+aside {
+  flex: 1;
+}
+
+.main {
+  width: 1200px;
+  margin-left: 400px;
+}
+
+.sneaker-pics {
+  margin-left: 330px;
+  margin-top: 50px;
+  margin-bottom: 100px;
+  gap: 20px;
+}
+
+.sneaker-pics img {
+  width: 350px;
+}
+
+.aside-sneakers {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin: 100px 100px;
+}
+
+.reviews {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 15px;
+}
+
+.reviews p {
+  margin-top: 18px;
+}
+
+.checkout form {
+  display: flex;
+  justify-content: start;
+  gap: 20px;
+}
+
+.checkout select {
+  outline: none;
+}
+
+aside .disclaimers {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+aside .disclaimers p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fa-check {
+  color: rgb(37, 152, 197);
+}
+
+.size-select {
+  width: 310px;
+}
+
+.qty-select {
+  align-self: flex-end;
+}

@@ -1,0 +1,65 @@
+.sneaker-title {
+  margin-top: 250px;
+  text-align: center;
+  margin-bottom: 150px;
+  font-size: 3rem;
+}
+
+.sneaker-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  justify-content: space-around;
+  gap: 80px;
+}
+
+.sneaker-card {
+  width: 300px;
+  padding: 20px 15px;
+  -o-transition: 0.5s;
+  -webkit-transition: 0.5s;
+  -moz-transition: 0.5s;
+  -ms-transition: 0.5s;
+  transition: 0.5s;
+  box-shadow: 0 8px 16px 0 rgba(13, 13, 14, 0.2),
+    0 12px 40px 0 rgba(15, 15, 15, 0.19);
+}
+
+.sneaker-card:hover {
+  -o-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  transform: scale(1.1);
+  box-shadow: 0 8px 16px 0 #4197e79a, 0 12px 40px 0 #4197e79a;
+}
+
+.sneaker-card-body img {
+  width: 100%;
+}
+
+.reviews {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+}
+
+.fa-star {
+  color: #116fc7;
+  margin: 15px 0;
+}
+
+.sneaker-link {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.699);
+}
+
+.nav-button button {
+  flex: 3;
+}
+
+.nav-button i {
+  font-size: 1.7rem;
+  margin: 0;
+  padding: 0;
+}

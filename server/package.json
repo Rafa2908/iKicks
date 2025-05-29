@@ -1,0 +1,33 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch-path=. server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@react-email/components": "^0.0.22",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.4",
+    "nodemailer": "^6.9.14",
+    "react-dom": "^18.3.1",
+    "stripe": "^16.5.0",
+    "validator": "^13.12.0",
+    "validators": "^0.3.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@babel/cli": "^7.24.8",
+    "@babel/node": "^7.25.0"
+  }
+}

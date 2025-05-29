@@ -1,0 +1,27 @@
+.below {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: rgba(211, 211, 211, 0.555);
+}
+
+.below p {
+  margin: 20px 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  -o-transition: 0.5s;
+  -webkit-transition: 0.5s;
+  -moz-transition: 0.5s;
+  -ms-transition: 0.5s;
+  transition: 0.5s;
+}
+
+.below p:hover {
+  color: #159edd;
+  -o-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  transform: scale(1.1);
+}
