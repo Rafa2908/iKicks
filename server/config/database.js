@@ -1,6 +1,5 @@
 import "dotenv/config";
 import pkg from "pg";
-
 const { Pool } = pkg;
 
 const pool = new Pool({
@@ -8,11 +7,8 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-try {
-  pool.connect();
-  console.log("DB connected successfully");
-} catch (error) {
-  console.error(error);
-}
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
+});
 
 export default pool;

@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@react-email/components": "^0.0.22",
+    "@react-email/components": "^1.0.12",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -19,7 +19,8 @@
     "handlebars": "^4.7.8",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.4",
-    "nodemailer": "^6.9.14",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
     "react-dom": "^18.3.1",
     "stripe": "^16.5.0",
     "validator": "^13.12.0",

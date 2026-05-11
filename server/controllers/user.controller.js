@@ -1,112 +1,78 @@
-import User from "../models/user.models.js"; //User model
-import dotenv from "dotenv";
-import bcrypt from "bcrypt"; //Encrypt password
-import jwt from "jsonwebtoken"; // Create token
-import validator from "validator"; // validator to validate email
-import { sendEmail } from "../emails/sendEmail.js";
-
-dotenv.config();
-
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET);
-};
+import pool from "../config/database.js";
+import "dotenv/config";
+import {
+  emailVerification,
+  nameVerification,
+  passwordVerification,
+} from "../utils/regex.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
-  const { first_name, last_name, email, password, confirm_password } = req.body;
+  const { firstName, lastName, email, password, confirmPassword } = req.body;
 
   try {
-    const userExist = await User.findOne({ email });
-    if (userExist) {
+    //Empty fields validation || Passed ✅
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      return res.status(400).json({ message: "All fields must be filled out" });
+    }
+
+    //Name regex validation || Passed ✅
+    if (!nameVerification(firstName) || !nameVerification(lastName)) {
+      return res.status(400).json({ message: "Invalid name. Try again" });
+    }
+
+    //Email validation || Passed ✅
+    if (!emailVerification(email)) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    //Password regex validation || Passed ✅
+    if (!passwordVerification(password)) {
       return res.status(400).json({
-        success: false,
-        message: "User already exist.",
+        message:
+          "Password must be at least 8 characters long, 1 uppercase, 1 lowercase, 1 number, and 1 special character",
       });
     }
 
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter a valid email.",
-      });
+    //Passwords match validation || Passed ✅
+    if (confirmPassword !== password) {
+      return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    if (password.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 8 characters long.",
-      });
+    const checkUser = await pool.query(
+      `
+      SELECT email FROM users
+      WHERE email=$1
+      `,
+      [email],
+    );
+
+    //Existing user validation // Passed ✅
+    if (checkUser.rowCount > 0) {
+      return res.status(400).json("User already exist");
     }
 
-    const newUser = new User({
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
-      password: password,
-      confirm_password: confirm_password,
-    });
+    //Hash password after password validation
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await newUser.save();
+    const newUser = await pool.query(
+      `
+      INSERT INTO users(first_name, last_name, email, password)
+      VALUES($1, $2, $3, $4) RETURNING email, id
+      `,
+      [firstName, lastName, email, hashedPassword],
+    );
 
-    sendEmail(newUser);
+    const token = jwt.sign(
+      { userId: newUser.rows[0].id, email: newUser.rows[0].email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
 
-    const token = createToken(newUser._id);
-
-    res.status(200).json({
-      success: true,
-      token,
-    });
+    return res.status(201).json(newUser, token);
   } catch (error) {
-    console.log(error);
-    res.status(400).json({
-      success: false,
-      message: error,
-    });
-  }
-};
-
-export const loginUSer = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User not found. Please register." });
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid credentials." });
-    }
-
-    const token = createToken(user._id);
-    res
-      .status(200)
-      .json({ success: true, message: "You logged in successfully", token });
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-export const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-export const getUserById = async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.body.userId });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(400).json(error);
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
