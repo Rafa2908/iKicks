@@ -4,7 +4,7 @@ const { Pool } = pkg;
 
 const pool = new Pool({
   connectionString: process.env.DBURL,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: true },
 });
 
 pool.on("error", (err) => {

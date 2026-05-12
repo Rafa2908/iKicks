@@ -70,9 +70,67 @@ export const registerUser = async (req, res) => {
       { expiresIn: "7d" },
     );
 
-    return res.status(201).json(newUser, token);
+    return res.status(201).json({ message: "Registration successful", token });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const loginUSer = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    //Input fields validation || Passed ✅
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields must be completed" });
+    }
+
+    //Valid email validation || Passed ✅
+    if (!emailVerification(email)) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    //Query user data
+    const potentialUser = await pool.query(
+      `
+      SELECT id, email, password, role FROM users
+      WHERE email=$1
+      `,
+      [email],
+    );
+
+    //Check if user exists
+    if (potentialUser.rowCount === 0) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    //Decrypt password to compare with password input by user
+    const hashedPassword = await bcrypt.compare(
+      password,
+      potentialUser.rows[0].password,
+    );
+
+    //Password match validation || Passed ✅
+    if (!hashedPassword) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    //Save user data in token upon successful authentication
+    const token = jwt.sign(
+      {
+        userId: potentialUser.rows[0].id,
+        email: potentialUser.rows[0].email,
+        role: potentialUser.rows[0].role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    return res.status(200).json({ message: "Logged in successfully", token });
+  } catch (error) {
+    console.error(error);
+
     return res.status(500).json({ message: "Internal server error" });
   }
 };
