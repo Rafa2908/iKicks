@@ -5,6 +5,7 @@ import "./config/database.js";
 // import { dbConnect } from "./config/config.mongoose.js";
 // import sneakerRouter from "./routes/sneaker.routes.js";
 import userRouter from "./routes/user.routes.js";
+import { sendEmail } from "./emails/email.js";
 // import cartRouter from "./routes/cart.routes.js";
 // import orderRouter from "./routes/order.routes.js";
 // import wishlistRouter from "./routes/wishlist.route.js";
