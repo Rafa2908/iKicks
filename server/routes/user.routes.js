@@ -4,18 +4,19 @@ import {
   generateCode,
   getAllUsers,
   getUserById,
-  loginUSer,
+  loginUser,
   registerUser,
   resetPassword,
   updateUserInfo,
   verifyCode,
 } from "../controllers/user.controller.js";
+import { authManager } from "../middleware/admin.js";
 
 const userRouter = Router();
 
-userRouter.route("").get(authMiddleware, getAllUsers);
+userRouter.route("").get(authMiddleware, authManager, getAllUsers);
 userRouter.route("/register").post(registerUser);
-userRouter.route("/login").post(loginUSer);
+userRouter.route("/login").post(loginUser);
 userRouter
   .route("/:userId")
   .get(authMiddleware, getUserById)

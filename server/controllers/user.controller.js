@@ -78,7 +78,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-export const loginUSer = async (req, res) => {
+export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -274,12 +274,12 @@ export const verifyCode = async (req, res) => {
 
   try {
     if (!userId || !resetCode) {
-      return res.status(404).json({ message: "Data not provided" });
+      return res.status(400).json({ message: "Data not provided" });
     }
 
     const user = await pool.query(
       `
-      SELECT reset_code, u.email FROM password_reset pr
+      SELECT pr.reset_code, pr.code_expiration, u.email FROM password_reset pr
       JOIN users u ON pr.user_id=u.id 
       WHERE pr.user_id=$1
       `,
@@ -290,8 +290,18 @@ export const verifyCode = async (req, res) => {
       return res.status(400).json({ message: "No user data available" });
     }
 
+    const date = new Date();
+    const expiration = user.rows[0].code_expiration;
+
+    if (date > expiration) {
+      await pool.query(`DELETE FROM password_reset WHERE user_id=$1`, [userId]);
+      return res
+        .status(400)
+        .json({ message: "Code expired. Please request new code." });
+    }
+
     if (resetCode !== user.rows[0].reset_code) {
-      return res.status(404).json({ message: "Invalid temporary code" });
+      return res.status(400).json({ message: "Invalid temporary code" });
     }
 
     const resetToken = jwt.sign(
@@ -302,12 +312,11 @@ export const verifyCode = async (req, res) => {
 
     return res.status(200).json({ resetToken });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 export const resetPassword = async (req, res) => {
   const { resetToken, newPassword, confirmPassword } = req.body;
 
