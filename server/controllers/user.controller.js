@@ -210,6 +210,66 @@ export const updateUserInfo = async (req, res) => {
   }
 };
 
+export const activateUserAccount = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!userId || isNaN(Number(userId))) {
+      return res.status(400).json({ message: "Invalid data" });
+    }
+
+    const update = await pool.query(
+      `
+      UPDATE users SET is_active=true WHERE id=$1 RETURNING id
+       `,
+      [userId],
+    );
+
+    if (update.rowCount === 0) {
+      return res
+        .status(400)
+        .json({ message: "Error activating account. Try again" });
+    }
+
+    return res.status(200).json({ message: "Account activated successfully" });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deactivateUserAccount = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!userId || isNaN(Number(userId))) {
+      return res.status(400).json({ message: "Invalid data" });
+    }
+
+    const update = await pool.query(
+      `
+      UPDATE users SET is_active=false WHERE id=$1 RETURNING id
+       `,
+      [userId],
+    );
+
+    if (update.rowCount === 0) {
+      return res
+        .status(400)
+        .json({ message: "Error deactivating account. Try again" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Account deactivated successfully" });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const generateCode = async (req, res) => {
   const { email } = req.body;
 
