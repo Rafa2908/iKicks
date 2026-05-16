@@ -3,8 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import "./config/database.js";
 // import { dbConnect } from "./config/config.mongoose.js";
-// import sneakerRouter from "./routes/sneaker.routes.js";
+
 import userRouter from "./routes/user.routes.js";
+import productRouter from "./routes/product.routes.js";
 import { sendEmail } from "./emails/email.js";
 // import cartRouter from "./routes/cart.routes.js";
 // import orderRouter from "./routes/order.routes.js";
@@ -16,8 +17,8 @@ const app = express();
 
 app.use(express.json(), express.urlencoded({ extended: true }));
 app.use(cors());
-// app.use("/sneaker", sneakerRouter);
 app.use("/user", userRouter);
+app.use("/product", productRouter);
 // app.use("/cart", cartRouter);
 // app.use("/order", orderRouter);
 // app.use("/wishlist", wishlistRouter);

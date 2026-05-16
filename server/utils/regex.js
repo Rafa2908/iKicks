@@ -5,6 +5,7 @@ const regex = {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
   phone: /^\+?1?\d{10}$/,
   address: /^[a-zA-Z0-9\s.,#'-]{5,100}$/,
+  sneakerName: /^[a-zA-Z0-9][a-zA-Z0-9\s\-\.\/]*$/,
 };
 
 export const nameVerification = (name) => {
@@ -25,4 +26,17 @@ export const addressVerification = (address) => {
 
 export const phoneVerification = (phone) => {
   return regex.phone.test(phone.trim());
+};
+
+export const productNameVerification = (name) => {
+  return regex.sneakerName.test(name);
+};
+
+export const urlValidation = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 };
