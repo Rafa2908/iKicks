@@ -65,6 +65,18 @@ export const registerUser = async (req, res) => {
       [firstName, lastName, email, hashedPassword],
     );
 
+    await pool.query(
+      `
+      INSERT INTO cart(user_id)
+      VALUES($1)
+      `,
+      [newUser.rows[0].id],
+    );
+
+    if (newUser.rowCount === 0) {
+      return res.status(200).json({ message: "Error signing up" });
+    }
+
     const token = jwt.sign(
       { userId: newUser.rows[0].id, email: newUser.rows[0].email },
       process.env.JWT_SECRET,
