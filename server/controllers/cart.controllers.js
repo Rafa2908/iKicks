@@ -107,3 +107,145 @@ export const addToCart = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const increaseQuantityInCart = async (req, res) => {
+  const { cartId, sizeId } = req.body;
+  const { userId, email } = req.user;
+
+  try {
+    console.log(userId, email);
+
+    if (!cartId || !sizeId) {
+      return res.status(400).json({ message: "No data provided" });
+    }
+
+    if (isNaN(Number(cartId)) || isNaN(Number(sizeId))) {
+      return res.status(400).json({ message: "Invalid data provided" });
+    }
+
+    const product = await pool.query(
+      `
+            SELECT quantity FROM product_size
+            WHERE id=$1
+            `,
+      [sizeId],
+    );
+
+    if (product.rowCount === 0) {
+      return res.status(404).json({ message: "Product size not found" });
+    }
+
+    const productQuantity = product.rows[0].quantity;
+
+    if (productQuantity === 0) {
+      return res.status(400).json({ message: "Product is out of stock" });
+    }
+
+    const cartItem = await pool.query(
+      `
+            SELECT quantity FROM cart_items
+            WHERE cart_id=$1 AND size_id=$2
+            AND cart_id IN (SELECT id FROM cart WHERE user_id=$3)
+            `,
+      [cartId, sizeId, userId],
+    );
+
+    if (cartItem.rowCount === 0) {
+      return res.status(404).json({ message: "Product is not in cart" });
+    }
+
+    const cartQuantity = cartItem.rows[0].quantity;
+
+    if (cartQuantity + 1 > productQuantity) {
+      return res.status(400).json({ message: "Not enough stock available" });
+    }
+
+    await pool.query(
+      `
+            UPDATE cart_items
+            SET quantity=quantity+1
+            WHERE cart_id=$1 AND size_id=$2
+            `,
+      [cartId, sizeId],
+    );
+
+    return res.status(200).json({ message: "Cart updated" });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const decreaseQuantityInCart = async (req, res) => {
+  const { cartId, sizeId } = req.body;
+  const { userId } = req.user;
+
+  try {
+    if (!cartId || !sizeId) {
+      return res.status(400).json({ message: "No data provided" });
+    }
+
+    if (isNaN(Number(cartId)) || isNaN(Number(sizeId))) {
+      return res.status(400).json({ message: "Invalid data provided" });
+    }
+
+    const product = await pool.query(
+      `
+            SELECT quantity FROM product_size
+            WHERE id=$1
+            `,
+      [sizeId],
+    );
+
+    if (product.rowCount === 0) {
+      return res.status(404).json({ message: "Product size not found" });
+    }
+
+    const productQuantity = product.rows[0].quantity;
+
+    const cartItem = await pool.query(
+      `
+            SELECT quantity FROM cart_items
+            WHERE cart_id=$1 AND size_id=$2
+            AND cart_id IN (SELECT id FROM cart WHERE user_id=$3)
+            `,
+      [cartId, sizeId, userId],
+    );
+
+    if (cartItem.rowCount === 0) {
+      return res.status(404).json({ message: "Product is not in cart" });
+    }
+
+    const cartQuantity = cartItem.rows[0].quantity;
+
+    if (cartQuantity === 1) {
+      await pool.query(
+        `
+                DELETE FROM cart_items
+                WHERE cart_id=$1 AND size_id=$2
+                `,
+        [cartId, sizeId],
+      );
+
+      return res.status(200).json({ message: "Product removed from cart" });
+    }
+
+    await pool.query(
+      `
+            UPDATE cart_items
+            SET quantity=quantity-1
+            WHERE cart_id=$1 AND size_id=$2
+            `,
+      [cartId, sizeId],
+    );
+
+    return res.status(200).json({ message: "Cart updated" });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getCartItemsPreview = async (req, res) => {};
