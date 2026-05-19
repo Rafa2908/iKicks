@@ -248,4 +248,93 @@ export const decreaseQuantityInCart = async (req, res) => {
   }
 };
 
-export const getCartItemsPreview = async (req, res) => {};
+export const getCartItemsPreview = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const cart = await pool.query(
+      `
+            SELECT id FROM cart WHERE user_id=$1
+            `,
+      [userId],
+    );
+
+    if (cart.rowCount === 0) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const cartId = cart.rows[0].id;
+
+    const cartDetails = await pool.query(
+      `
+            SELECT 
+                json_agg(
+                    json_build_object(
+                        'name', p.name,
+                        'brand', p.brand,
+                        'quantity', ci.quantity,
+                        'size', ps.size,
+                        'image', pi.url,
+                        'total', (ci.quantity * ci.price_at_add)
+                )
+                ) AS products,
+                SUM(ci.quantity * ci.price_at_add) AS subtotal
+            FROM products p
+            JOIN product_image pi
+                ON p.id = pi.product_id
+            JOIN product_size ps
+                ON p.id = ps.product_id
+            JOIN cart_items ci
+                ON ps.id = ci.size_id
+            WHERE ci.cart_id = $1
+                AND ci.cart_id IN (
+                    SELECT id
+                    FROM cart
+                    WHERE user_id = $2
+                )
+                AND pi.is_primary = true;
+            `,
+      [cartId, userId],
+    );
+
+    if (!cartDetails.rows[0].products) {
+      return res.status(404).json({ message: "Cart is empty" });
+    }
+
+    return res.status(200).json(cartDetails.rows);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteCartItem = async (req, res) => {
+  const { userId } = req.user;
+  const { sizeId } = req.body;
+  try {
+    if (!sizeId || isNaN(Number(sizeId))) {
+      return res.status(400).json({ message: "Invalid data provided" });
+    }
+
+    const deletedItem = await pool.query(
+      `
+            DELETE FROM cart_items
+            WHERE cart_id=(SELECT id FROM cart WHERE user_id=$1) 
+            AND size_id=$2
+            RETURNING id
+            `,
+      [userId, sizeId],
+    );
+
+    if (deletedItem.rowCount === 0) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+
+    return res.status(200).json({ message: "Product removed from cart" });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
