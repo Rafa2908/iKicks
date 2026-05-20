@@ -9,7 +9,7 @@ import productRouter from "./routes/product.routes.js";
 import { sendEmail } from "./emails/email.js";
 import cartRouter from "./routes/cart.routes.js";
 import shippingRouter from "./routes/shipping.routes.js";
-// import orderRouter from "./routes/order.routes.js";
+import orderRouter from "./routes/order.routes.js";
 // import wishlistRouter from "./routes/wishlist.route.js";
 
 dotenv.config();
@@ -22,7 +22,7 @@ app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/cart", cartRouter);
 app.use("/shipping", shippingRouter);
-// app.use("/order", orderRouter);
+app.use("/order", orderRouter);
 // app.use("/wishlist", wishlistRouter);
 
 const PORT = process.env.PORT;

@@ -1,124 +1,124 @@
-import Stripe from "stripe";
-import dotenv from "dotenv";
-import Order from "../models/order.models.js";
-import User from "../models/user.models.js";
-import { orderConfirmationEmail } from "../emails/sendEmail.js";
+import pool from "../config/database.js";
+import { fullNameVerification, phoneVerification } from "../utils/regex.js";
 
-dotenv.config();
-
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-export const stripePayment = async (req, res) => {
-  const { amount } = req.body;
+export const placeOrder = async (req, res) => {
+  const { userId } = req.user;
+  const { addressId, recipientName, phoneNumber } = req.body;
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100,
-      currency: "usd",
-    });
-    res.status(200).json({
-      clientSecret: paymentIntent.client_secret,
-    });
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-const placeOrder = async (req, res) => {
-  const frontend_url = "http://localhost:5173";
-
-  try {
-    const newOrder = new Order({
-      userId: req.body.userId,
-      items: req.body.items,
-      amount: req.body.amount,
-      address: req.body.address,
-    });
-
-    await newOrder.save();
-
-    // Calculate the subtotal (sum of all item prices)
-    const subtotal = req.body.items.reduce((total, sneaker) => {
-      return total + sneaker.price * sneaker.quantity;
-    }, 0);
-
-    // Calculate the 10% tax
-    const taxRate = 0.1; // 10% tax
-    const taxAmount = Math.round(subtotal * taxRate * 100); // Calculate tax and convert to cents
-
-    // Calculate the total amount including tax
-    const totalAmount = Math.round(subtotal * 100 + taxAmount);
-
-    const line_items = req.body.items.map((sneaker) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: sneaker.name,
-        },
-        unit_amount: sneaker.price * 100, // Price in cents
-      },
-      quantity: sneaker.quantity,
-    }));
-
-    // Add tax as a separate line item
-    line_items.push({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: "Tax (10%)",
-        },
-        unit_amount: taxAmount,
-      },
-      quantity: 1,
-    });
-
-    const session = await stripe.checkout.sessions.create({
-      line_items: line_items,
-      mode: "payment",
-      success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
-    });
-
-    res.status(200).json({ success: true, session_url: session.url });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const verifyOrder = async (req, res) => {
-  const { orderId, success, userId } = req.body;
-  try {
-    if (success === "true") {
-      await Order.findByIdAndUpdate(orderId, { payment: true });
-
-      await User.findByIdAndUpdate(userId, {
-        cartData: {},
-      });
-
-      const orderConfirmation = await Order.findById(orderId);
-
-      const findUser = await User.findById(orderConfirmation.userId);
-
-      orderConfirmationEmail(findUser, orderConfirmation);
-
-      res.status(200).json({ success: true, message: "Paid" });
-    } else {
-      await Order.findByIdAndDelete(orderId);
-
-      res.status(200).json({ success: false, message: "Not paid" });
+    //Data validation || Passed ✅
+    if (!addressId || !recipientName || !phoneNumber) {
+      return res.status(400).json({ message: "No data provided" });
     }
+
+    //Checks if shipping Id is valid || Passed ✅
+    if (isNaN(Number(addressId))) {
+      return res.status(400).json({ message: "Invalid shipping information" });
+    }
+
+    //Recipient name validation || Passed ✅
+    if (!fullNameVerification(recipientName)) {
+      return res.status(400).json({ message: "Invalid name" });
+    }
+
+    //Phone number validation || Passed ✅
+    if (!phoneVerification(phoneNumber)) {
+      return res.status(400).json({ message: "Invalid phone number" });
+    }
+
+    await pool.query("BEGIN");
+
+    const cart = await pool.query(
+      `
+      SELECT c.id FROM cart c
+      JOIN shipping s
+      ON c.user_id=s.user_id
+      WHERE c.user_id=$1 AND s.id=$2
+      `,
+      [userId, addressId],
+    );
+
+    if (cart.rowCount === 0) {
+      await pool.query("ROLLBACK");
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const cartId = cart.rows[0].id;
+
+    const cartItems = await pool.query(
+      `
+      SELECT 
+        json_agg(
+          json_build_object(
+            'size_id', size_id,
+            'price_at_add', price_at_add,
+            'quantity', quantity
+          )
+        ) AS items,
+        SUM(price_at_add * quantity) AS total
+      FROM cart_items
+      WHERE cart_id=$1;
+      `,
+      [cartId],
+    );
+
+    if (!cartItems.rows[0].items) {
+      await pool.query("ROLLBACK");
+      return res.status(404).json({ message: "Cart is empty" });
+    }
+
+    const total = cartItems.rows[0].total;
+
+    const newOrder = await pool.query(
+      `
+      INSERT INTO orders(user_id, address_id, recipient_name, phone_number, total_at_purchase)
+      VALUES($1, $2, $3, $4, $5) RETURNING id
+      `,
+      [userId, addressId, recipientName, phoneNumber, total],
+    );
+
+    const orderId = newOrder.rows[0].id;
+
+    for (const item of cartItems.rows[0].items) {
+      await pool.query(
+        `
+        INSERT INTO order_items(order_id, size_id, quantity, price_at_purchase)
+        VALUES($1, $2, $3, $4)
+        `,
+        [orderId, item.size_id, item.quantity, item.price_at_add],
+      );
+
+      const update = await pool.query(
+        `
+      UPDATE product_size
+      SET quantity = quantity - $1
+      WHERE id=$2 AND quantity >= $1
+      RETURNING id
+      `,
+        [item.quantity, item.size_id],
+      );
+
+      if (update.rowCount === 0) {
+        await pool.query("ROLLBACK");
+        return res.status(400).json({ message: "Error submitting order" });
+      }
+    }
+
+    await pool.query(
+      `
+      DELETE FROM cart_items
+      WHERE cart_id=$1
+      `,
+      [cartId],
+    );
+
+    await pool.query("COMMIT");
+
+    return res.status(201).json({ message: "Order processed successfully" });
   } catch (error) {
-    console.error("Error in verifyOrder:", error);
-    res.status(400).json(error);
+    console.error(error);
+
+    await pool.query("ROLLBACK");
+
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-export const userOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({ userId: req.body.userId });
-    res.status(200).json({ success: true, orders });
-  } catch (error) {
-    res.status(400).json(error);
-  }
-};
-
-export default placeOrder;

@@ -1,14 +1,10 @@
 import { Router } from "express";
-import placeOrder, {
-  userOrders,
-  verifyOrder,
-} from "../controllers/order.controllers.js";
 import authMiddleware from "../middleware/auth.js";
+import { placeOrder } from "../controllers/order.controllers.js";
+authMiddleware;
 
 const orderRouter = Router();
 
 orderRouter.route("/place").post(authMiddleware, placeOrder);
-orderRouter.route("/verify").post(authMiddleware, verifyOrder);
-orderRouter.route("/userorders").get(authMiddleware, userOrders);
 
 export default orderRouter;
