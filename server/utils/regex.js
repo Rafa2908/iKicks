@@ -4,7 +4,8 @@ const regex = {
   password:
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
   phone: /^\+?1?\d{10}$/,
-  address: /^[a-zA-Z0-9\s.,#'-]{5,100}$/,
+  address:
+    /^\d+\s+[a-zA-Z0-9\s.#'-]+\s(?:St|Street|Ave|Avenue|Blvd|Boulevard|Rd|Road|Ln|Lane|Dr|Drive|Ct|Court|Pl|Place|Way|Terrace|Ter|Circle|Cir)\.?$/i,
   sneakerName: /^[a-zA-Z0-9][a-zA-Z0-9\s\-\.\/]*$/,
 };
 
