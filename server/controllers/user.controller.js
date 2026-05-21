@@ -7,7 +7,7 @@ import {
 } from "../utils/regex.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { sendEmail } from "../emails/email.js";
+import { sendPasswordResetCode } from "../emails/email.js";
 
 export const registerUser = async (req, res) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
@@ -329,7 +329,7 @@ export const generateCode = async (req, res) => {
       [userId, code, expiration],
     );
 
-    await sendEmail(code);
+    await sendPasswordResetCode(code);
 
     return res
       .status(200)

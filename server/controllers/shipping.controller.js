@@ -30,7 +30,7 @@ export const addShippingAddress = async (req, res) => {
 
     const addressExist = await pool.query(
       `
-        SELECT id FROM shipping
+        SELECT id FROM shipping_addresses
         WHERE user_id=$1 AND address_1=$2 AND city=$3 AND zipcode=$4
         `,
       [userId, address_1, city, zipcode],
@@ -46,7 +46,7 @@ export const addShippingAddress = async (req, res) => {
 
     const newShippingAddress = await pool.query(
       `
-        INSERT INTO shipping(user_id, address_1, address_2, city, state, zipcode)
+        INSERT INTO shipping_addresses(user_id, address_1, address_2, city, state, zipcode)
         VALUES($1, $2, $3, $4, $5, $6) RETURNING id
         `,
       [userId, address_1, address2, city, state, zipcode],
@@ -89,7 +89,7 @@ export const updateShippingAddress = async (req, res) => {
 
     const update = await pool.query(
       `
-        UPDATE shipping
+        UPDATE shipping_addresses
         SET address_1=$1, address_2=$2, city=$3, state=$4, zipcode=$5 
         WHERE id=$6
         RETURNING id
@@ -125,7 +125,7 @@ export const deleteShippingAddress = async (req, res) => {
 
     const deleteAddress = await pool.query(
       `
-            DELETE FROM shipping
+            DELETE FROM shipping_addresses
             WHERE id=$1 AND user_id=$2
             RETURNING id
             `,
@@ -152,7 +152,7 @@ export const userShippingAddresses = async (req, res) => {
   try {
     const addresses = await pool.query(
       `
-            SELECT * FROM shipping
+            SELECT * FROM shipping_addresses
             WHERE user_id=$1
             `,
       [userId],

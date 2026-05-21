@@ -70,7 +70,7 @@ export const placeOrder = async (req, res) => {
 
     const newOrder = await pool.query(
       `
-      INSERT INTO orders(user_id, address_id, recipient_name, phone_number, total_at_purchase)
+      INSERT INTO orders(user_id, shipping_address_id, recipient_name, phone_number, total_at_purchase)
       VALUES($1, $2, $3, $4, $5) RETURNING id
       `,
       [userId, addressId, recipientName, phoneNumber, total],
@@ -89,10 +89,10 @@ export const placeOrder = async (req, res) => {
 
       const update = await pool.query(
         `
-      UPDATE product_size
-      SET quantity = quantity - $1
-      WHERE id=$2 AND quantity >= $1
-      RETURNING id
+        UPDATE product_size
+        SET quantity = quantity - $1
+        WHERE id=$2 AND quantity >= $1
+        RETURNING id
       `,
         [item.quantity, item.size_id],
       );
@@ -102,6 +102,14 @@ export const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Error submitting order" });
       }
     }
+
+    await pool.query(
+      `
+      INSERT INTO shipping_orders(order_id, shipping_address_id)
+      VALUES($1, $2)
+      `,
+      [orderId, newOrder.rows[0].shipping_address_id],
+    );
 
     await pool.query(
       `
@@ -118,6 +126,106 @@ export const placeOrder = async (req, res) => {
     console.error(error);
 
     await pool.query("ROLLBACK");
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getOrderPreview = async (req, res) => {
+  const { userId } = req.user;
+
+  try {
+    const orders = await pool.query(
+      `
+      SELECT o.id, o.recipient_name, o.total_at_purchase,
+      json_agg(
+        json_build_object
+        (
+          'image', pi.url, 
+          'name', p.name, 
+          'brand', p.brand
+        )) as items
+      FROM orders o 
+        JOIN order_items oi
+      ON o.id=oi.order_id
+        JOIN product_size ps
+      ON oi.size_id=ps.id
+        JOIN product_image pi
+      ON ps.product_id=pi.product_id
+        JOIN products p
+      ON pi.product_id=p.id
+        WHERE o.user_id=$1 AND pi.is_primary=true
+      GROUP BY o.id
+      `,
+      [userId],
+    );
+
+    if (orders.rowCount === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    return res.status(200).json(orders.rows);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getOrderDetails = async (req, res) => {
+  const { userId } = req.user;
+  const { shippingId } = req.params;
+
+  try {
+    const orders = await pool.query(
+      `
+        SELECT 
+            o.id, 
+            o.recipient_name, 
+            o.total_at_purchase, 
+            o.status,
+            JSON_AGG(
+                JSON_BUILD_OBJECT(
+                'name', p.name,
+                'brand', p.brand,
+                'price', oi.price_at_purchase,
+                'size', ps.size,
+                'quantity', oi.quantity,
+                'image', pi.url
+                )
+            ) AS items,
+            JSON_BUILD_OBJECT(
+                'address_1', sa.address_1,
+                'address_2', sa.address_2,
+                'city', sa.city,
+                'state', sa.state,
+                'zipcode', sa.zipcode
+            ) AS ship_to
+            FROM orders o
+            JOIN order_items oi ON o.id = oi.order_id
+            JOIN product_size ps ON oi.size_id = ps.id
+            JOIN products p ON ps.product_id = p.id
+            JOIN lateral (
+            SELECT url FROM product_image 
+            WHERE product_id = p.id AND is_primary = true 
+            LIMIT 1
+            ) pi ON true
+            JOIN shipping_addresses sa ON o.shipping_address_id = sa.id
+            WHERE sa.user_id=$1   
+            AND sa.id=$2
+        GROUP BY o.id, sa.address_1, sa.address_2, sa.city, sa.state, sa.zipcode;
+
+            `,
+      [userId, shippingId],
+    );
+
+    if (orders.rowCount === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    return res.status(200).json(orders.rows);
+  } catch (error) {
+    console.error(error);
 
     return res.status(500).json({ message: "Internal server error" });
   }

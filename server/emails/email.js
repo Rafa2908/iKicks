@@ -2,7 +2,9 @@ import "dotenv/config";
 import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_KEY);
 
-const getEmailHtml = (code) => `
+const registrationHtml = (name) => {};
+
+const resetPasswordHtml = (code) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,17 +166,36 @@ const getEmailHtml = (code) => `
 </body>
 </html>
 `;
+const OrderConfirmationHtml = (order) => {};
 
-export const sendEmail = async (code) => {
+export const sendPasswordResetCode = async (code, email) => {
   const { data, error } = await resend.emails.send({
     from: "iKicks <onboarding@resend.dev>",
-    to: ["papaus02@gmail.com"],
+    to: [`${email}`],
     subject: "Your Temporary password reset code",
-    html: getEmailHtml(code),
+    html: resetPasswordHtml(code),
   });
 
   if (error) {
     console.error(error);
   }
   console.log(data);
+};
+
+export const sendOrderConfirmation = async (order, email) => {
+  const { data, error } = await resend.emails.send({
+    from: "iKicks <onboarding@resend.dev>",
+    to: [`${email}`],
+    subject: "Order Confirmation",
+    html: OrderConfirmationHtml(order),
+  });
+};
+
+export const sendRegistrationConfirmation = async (name, email) => {
+  const { data, error } = await resend.emails.send({
+    from: "iKicks <onboarding@resend.dev>",
+    to: [`${email}`],
+    subject: "Welcome to the iKicks family 👟",
+    html: registrationHtml(name),
+  });
 };
