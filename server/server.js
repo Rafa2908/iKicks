@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import "./config/database.js";
+
 // import { dbConnect } from "./config/config.mongoose.js";
 
 import userRouter from "./routes/user.routes.js";
@@ -11,9 +12,8 @@ import cartRouter from "./routes/cart.routes.js";
 import shippingRouter from "./routes/shipping.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
+import wishlistRouter from "./routes/wishlist.routes.js";
 import { stripeWebhook } from "./controllers/payment.controller.js";
-
-// import wishlistRouter from "./routes/wishlist.route.js";
 
 dotenv.config();
 
@@ -29,7 +29,7 @@ app.use("/cart", cartRouter);
 app.use("/shipping", shippingRouter);
 app.use("/order", orderRouter);
 app.use("/payment", paymentRouter);
-// app.use("/wishlist", wishlistRouter);
+app.use("/wishlist", wishlistRouter);
 
 const PORT = process.env.PORT;
 

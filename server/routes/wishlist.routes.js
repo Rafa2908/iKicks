@@ -1,15 +1,13 @@
 import { Router } from "express";
-import {
-  addSneakerToWishlist,
-  deleteSneakerFromWishlist,
-} from "../controllers/wishlist.controller.js";
 import authMiddleware from "../middleware/auth.js";
+import {
+  addToWishlist,
+  wishlistPreview,
+} from "../controllers/wishlist.controller.js";
 
 const wishlistRouter = Router();
 
-wishlistRouter
-  .route("/")
-  .post(authMiddleware, addSneakerToWishlist)
-  .delete(authMiddleware, deleteSneakerFromWishlist);
+wishlistRouter.route("/add").post(authMiddleware, addToWishlist);
+wishlistRouter.route("/preview").get(authMiddleware, wishlistPreview);
 
 export default wishlistRouter;

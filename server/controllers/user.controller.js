@@ -7,7 +7,10 @@ import {
 } from "../utils/regex.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { sendPasswordResetCode } from "../emails/email.js";
+import {
+  sendPasswordResetCode,
+  sendRegistrationConfirmation,
+} from "../emails/email.js";
 
 export const registerUser = async (req, res) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
@@ -60,7 +63,7 @@ export const registerUser = async (req, res) => {
     const newUser = await pool.query(
       `
       INSERT INTO users(first_name, last_name, email, password)
-      VALUES($1, $2, $3, $4) RETURNING email, id
+      VALUES($1, $2, $3, $4) RETURNING email, id, first_name
       `,
       [firstName, lastName, email, hashedPassword],
     );
@@ -81,6 +84,11 @@ export const registerUser = async (req, res) => {
       { userId: newUser.rows[0].id, email: newUser.rows[0].email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
+    );
+
+    await sendRegistrationConfirmation(
+      newUser.rows[0].first_name,
+      newUser.rows[0].email,
     );
 
     return res.status(201).json({ message: "Registration successful", token });
@@ -167,7 +175,7 @@ export const getAllUsers = async (req, res) => {
 };
 
 export const getUserById = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
 
   try {
     const user = await pool.query(
@@ -329,7 +337,7 @@ export const generateCode = async (req, res) => {
       [userId, code, expiration],
     );
 
-    await sendPasswordResetCode(code);
+    await sendPasswordResetCode(code, email);
 
     return res
       .status(200)
