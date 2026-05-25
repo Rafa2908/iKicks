@@ -77,6 +77,30 @@ export const stripeWebhook = async (req, res) => {
       const orderId = paymentSuccess.metadata.order_id;
       const total = paymentSuccess.amount_received / 100;
 
+      const paymentExist = await pool.query(
+        `
+        SELECT id FROM transactions WHERE order_id=$1
+        `,
+        [orderId],
+      );
+
+      if (paymentExist.rowCount > 0) {
+        if (paymentExist.rows[0].status === "completed") {
+          return res.status(200).json({ message: "Payment exist" });
+        }
+
+        if (paymentExist.rows[0].status === "failed") {
+          await pool.query(
+            `
+            UPDATE transactions
+            SET payment_id=$1 AND status='completed'
+            WHERE order_id=$2
+            `,
+            [paymentId, orderId],
+          );
+        }
+      }
+
       await pool.query(
         `
         INSERT INTO transactions(order_id, payment_id, total_paid, status)
@@ -98,7 +122,26 @@ export const stripeWebhook = async (req, res) => {
     }
     case "payment_intent.payment_failed": {
       const paymentFail = event.data.object;
-      console.log(paymentFail);
+      const paymentId = paymentFail.id;
+      const orderId = paymentFail.metadata.order_id;
+      const total = paymentFail.amount_received / 100;
+
+      await pool.query(
+        `
+        INSERT INTO transactions(order_id, payment_id, total_paid, status)
+        VALUES($1, $2, $3, 'failed')
+        `,
+        [orderId, paymentId, total],
+      );
+
+      await pool.query(
+        `
+        UPDATE orders
+        SET status='failed' 
+        WHERE id=$1
+        `,
+        [orderId],
+      );
       break;
     }
     default:

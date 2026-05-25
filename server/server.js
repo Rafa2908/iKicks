@@ -38,6 +38,4 @@ app.use("/wishlist", wishlistRouter);
 
 const PORT = process.env.PORT;
 
-// dbConnect();
-
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));

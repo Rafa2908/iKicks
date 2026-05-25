@@ -198,8 +198,6 @@ export const getUserById = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    console.log(userId);
-
     const user = await pool.query(
       `SELECT email, first_name, last_name FROM users WHERE id=$1`,
       [userId],
