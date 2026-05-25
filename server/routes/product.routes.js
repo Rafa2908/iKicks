@@ -10,17 +10,18 @@ import {
 } from "../controllers/product.controllers.js";
 import authMiddleware from "../middleware/auth.js";
 import { authManager } from "../middleware/admin.js";
+import { getDataLimiter, updateDataLimiter } from "../utils/rateLimiter.js";
 
 const productRouter = Router();
 
-productRouter.route("/add").post(authMiddleware, authManager, addNewProduct);
-productRouter.route("/preview").get(getProductsPreview);
-productRouter.route("/details/:productId").get(getProductDetails);
+productRouter.route("/add").post(authMiddleware, authManager, updateDataLimiter, addNewProduct);
+productRouter.route("/preview").get(getDataLimiter, getProductsPreview);
+productRouter.route("/details/:productId").get(getDataLimiter, getProductDetails);
 productRouter
   .route("/update/quantity")
-  .put(authMiddleware, authManager, updateQuantityBySize);
-productRouter.route("/update/:productId").put(updatePriceById);
-productRouter.route("/filter").get(filterProducts);
-productRouter.route("/filter/price").get(filterByPrice);
+  .put(authMiddleware, authManager, updateDataLimiter, updateQuantityBySize);
+productRouter.route("/update/:productId").put(updateDataLimiter, updatePriceById);
+productRouter.route("/filter").get(getDataLimiter, filterProducts);
+productRouter.route("/filter/price").get(getDataLimiter, filterByPrice);
 
 export default productRouter;

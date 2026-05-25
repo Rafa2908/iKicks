@@ -76,3 +76,21 @@ export const adminDataLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+export const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => req.user?.id || ipKeyGenerator(req),
+  message: { message: "Too many payment attempts. Try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export const orderLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => req.user?.id || ipKeyGenerator(req),
+  message: { message: "Too many order requests. Try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

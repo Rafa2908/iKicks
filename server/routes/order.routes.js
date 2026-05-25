@@ -5,12 +5,12 @@ import {
   getOrderPreview,
   placeOrder,
 } from "../controllers/order.controllers.js";
-authMiddleware;
+import { getDataLimiter, orderLimiter } from "../utils/rateLimiter.js";
 
 const orderRouter = Router();
 
-orderRouter.route("/place").post(authMiddleware, placeOrder);
-orderRouter.route("/preview").get(authMiddleware, getOrderPreview);
-orderRouter.route("/details/:shippingId").get(authMiddleware, getOrderDetails);
+orderRouter.route("/place").post(authMiddleware, orderLimiter, placeOrder);
+orderRouter.route("/preview").get(authMiddleware, getDataLimiter, getOrderPreview);
+orderRouter.route("/details/:shippingId").get(authMiddleware, getDataLimiter, getOrderDetails);
 
 export default orderRouter;
