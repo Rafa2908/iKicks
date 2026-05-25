@@ -1,10 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import "./config/database.js";
-
-// import { dbConnect } from "./config/config.mongoose.js";
-
 import userRouter from "./routes/user.routes.js";
 import productRouter from "./routes/product.routes.js";
 import "./emails/email.js";
@@ -22,7 +20,14 @@ const app = express();
 app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 app.use(express.json(), express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
+
 app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/cart", cartRouter);

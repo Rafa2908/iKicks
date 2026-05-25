@@ -1,10 +1,8 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-dotenv.config();
+import "dotenv/config";
 
 const authMiddleware = async (req, res, next) => {
-  const { token } = req.headers;
+  const token = req.cookies.token;
 
   if (!token) {
     return res.json({
@@ -14,8 +12,8 @@ const authMiddleware = async (req, res, next) => {
   }
 
   try {
-    const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = token_decode;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
     next();
   } catch (error) {
     return res.json({ success: false, message: error });

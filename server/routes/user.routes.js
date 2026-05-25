@@ -7,6 +7,7 @@ import {
   getAllUsers,
   getUserById,
   loginUser,
+  logoutUser,
   registerUser,
   resetPassword,
   updateUserInfo,
@@ -31,7 +32,8 @@ userRouter
   .route("/admin")
   .get(authMiddleware, adminDataLimiter, authManager, getAllUsers);
 userRouter.route("/register").post(authLimiter, registerUser);
-userRouter.route("/login").post(signInLimiter, loginUser);
+userRouter.route("/login").post(authLimiter, loginUser);
+userRouter.route("/logout").post(authLimiter, logoutUser);
 userRouter
   .route("/:userId")
   .get(authMiddleware, getDataLimiter, getUserById)

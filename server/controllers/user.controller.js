@@ -91,7 +91,14 @@ export const registerUser = async (req, res) => {
       newUser.rows[0].email,
     );
 
-    return res.status(201).json({ message: "Registration successful", token });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(201).json({ message: "Registration successful" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -148,12 +155,25 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" },
     );
 
-    return res.status(200).json({ message: "Logged in successfully", token });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ message: "Logged in successfully" });
   } catch (error) {
     console.error(error);
 
     return res.status(500).json({ message: "Internal server error" });
   }
+};
+
+export const logoutUser = (req, res) => {
+  res.clearCookie("token");
+
+  return res.status(200).json({ message: "Logout successfully" });
 };
 
 export const getAllUsers = async (req, res) => {
@@ -178,6 +198,8 @@ export const getUserById = async (req, res) => {
   const { userId } = req.user;
 
   try {
+    console.log(userId);
+
     const user = await pool.query(
       `SELECT email, first_name, last_name FROM users WHERE id=$1`,
       [userId],
@@ -443,6 +465,13 @@ export const resetPassword = async (req, res) => {
       `,
       [update.rows[0].id],
     );
+
+    res.cookie("token", resetToken, {
+      httpOnly: true,
+      secure: process.env.NOVE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     return res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
