@@ -44,7 +44,34 @@ export const resetPasswordLimiter = rateLimit({
 export const getDataLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 50,
-  keyGenerator: (req) => `${req.user?.userId}:${req.path}`,
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: { message: "Too many requests. Try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export const updateDataLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: { message: "Too many update requests. Try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export const accountStatusLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: { message: "Too many attempts. Try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export const adminDataLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 50,
+  keyGenerator: (req) => req.user?.id || req.ip,
   message: { message: "Too many requests. Try again later" },
   standardHeaders: true,
   legacyHeaders: false,
