@@ -1,4 +1,5 @@
 import pool from "../config/database.js";
+import { generateUrl } from "../utils/ImageUrlGenerator.js";
 import {
   nameVerification,
   productNameVerification,
@@ -10,6 +11,9 @@ export const addNewProduct = async (req, res) => {
     req.body;
 
   try {
+    //Upload images to Cloudinary
+    const imageUrls = await generateUrl(images);
+
     //Database transaction begins
     await pool.query("BEGIN");
 
@@ -107,13 +111,13 @@ export const addNewProduct = async (req, res) => {
     const productId = newProduct.rows[0].id;
 
     //For loop to insert images into database
-    for (let i = 0; i < images.length; i++) {
+    for (let i = 0; i < imageUrls.length; i++) {
       await pool.query(
         `
-                INSERT INTO product_image(product_id, url, is_primary)
-                VALUES($1, $2, $3)
-                `,
-        [productId, images[i], i === 0],
+          INSERT INTO product_image(product_id, url, is_primary)
+          VALUES($1, $2, $3)
+        `,
+        [productId, imageUrls[i], i === 0],
       );
     }
 
