@@ -11,6 +11,7 @@ import shippingRouter from "./routes/shipping.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import wishlistRouter from "./routes/wishlist.routes.js";
+import invoiceRouter from "./routes/invoice.routes.js";
 import { stripeWebhook } from "./controllers/payment.controller.js";
 import "./utils/ImageUrlGenerator.js";
 
@@ -36,6 +37,7 @@ app.use("/shipping", shippingRouter);
 app.use("/order", orderRouter);
 app.use("/payment", paymentRouter);
 app.use("/wishlist", wishlistRouter);
+app.use("/invoice", invoiceRouter);
 
 const PORT = process.env.PORT;
 
