@@ -113,8 +113,6 @@ export const increaseQuantityInCart = async (req, res) => {
   const { userId, email } = req.user;
 
   try {
-    console.log(userId, email);
-
     if (!cartId || !sizeId) {
       return res.status(400).json({ message: "No data provided" });
     }

@@ -1,6 +1,8 @@
 import pool from "../config/database.js";
 import Stripe from "stripe";
 import "dotenv/config";
+import { generateInvoice } from "./invoice.controller.js";
+import { sendOrderConfirmation } from "../emails/email.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -75,11 +77,12 @@ export const stripeWebhook = async (req, res) => {
       const paymentSuccess = event.data.object;
       const paymentId = paymentSuccess.id;
       const orderId = paymentSuccess.metadata.order_id;
+      const userId = paymentSuccess.metadata.user_id;
       const total = paymentSuccess.amount_received / 100;
 
       const paymentExist = await pool.query(
         `
-        SELECT id FROM transactions WHERE order_id=$1
+        SELECT id, status FROM transactions WHERE order_id=$1
         `,
         [orderId],
       );
@@ -93,30 +96,93 @@ export const stripeWebhook = async (req, res) => {
           await pool.query(
             `
             UPDATE transactions
-            SET payment_id=$1 AND status='completed'
+            SET payment_id=$1, status='completed'
             WHERE order_id=$2
             `,
             [paymentId, orderId],
           );
+
+          await pool.query(
+            `
+            UPDATE orders
+            SET status='completed'
+            WHERE id=$1
+            `,
+            [orderId],
+          );
+
+          return res.status(200).json({ received: true });
+        }
+      } else {
+        await pool.query(
+          `
+          INSERT INTO transactions(order_id, payment_id, total_paid, status)
+          VALUES($1, $2, $3, 'completed')
+          `,
+          [orderId, paymentId, total],
+        );
+
+        await pool.query(
+          `
+          UPDATE orders
+          SET status='completed'
+          WHERE id=$1
+          `,
+          [orderId],
+        );
+
+        const userResult = await pool.query(
+          `SELECT email FROM users WHERE id=$1`,
+          [userId],
+        );
+
+        const order = await pool.query(
+          `
+          SELECT
+            o.id,
+            o.recipient_name,
+            o.phone_number,
+            o.total_at_purchase,
+            o.status,
+            o.created_at,
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'name', p.name,
+                'brand', p.brand,
+                'colorway', p.colorway,
+                'price', oi.price_at_purchase,
+                'size', ps.size,
+                'quantity', oi.quantity,
+                'image', pi.url
+              )
+            ) AS items,
+            JSON_BUILD_OBJECT(
+              'address_1', sa.address_1,
+              'address_2', sa.address_2,
+              'city', sa.city,
+              'state', sa.state,
+              'zipcode', sa.zipcode
+            ) AS ship_to
+          FROM orders o
+          JOIN order_items oi ON o.id = oi.order_id
+          JOIN product_size ps ON oi.size_id = ps.id
+          JOIN products p ON ps.product_id = p.id
+          JOIN LATERAL (
+            SELECT url FROM product_image
+            WHERE product_id = p.id AND is_primary = true
+            LIMIT 1
+          ) pi ON true
+          JOIN shipping_addresses sa ON o.shipping_address_id = sa.id
+          WHERE o.id=$1 AND sa.user_id=$2
+          GROUP BY o.id, sa.address_1, sa.address_2, sa.city, sa.state, sa.zipcode
+          `,
+          [orderId, userId],
+        );
+
+        if (order.rowCount > 0 && userResult.rowCount > 0) {
+          await sendOrderConfirmation(order.rows[0], userResult.rows[0].email);
         }
       }
-
-      await pool.query(
-        `
-        INSERT INTO transactions(order_id, payment_id, total_paid, status)
-        VALUES($1, $2, $3, 'completed')
-        `,
-        [orderId, paymentId, total],
-      );
-
-      await pool.query(
-        `
-        UPDATE orders
-        SET status='completed' 
-        WHERE id=$1
-        `,
-        [orderId],
-      );
 
       break;
     }

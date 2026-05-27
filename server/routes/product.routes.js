@@ -20,7 +20,7 @@ productRouter.route("/details/:productId").get(getDataLimiter, getProductDetails
 productRouter
   .route("/update/quantity")
   .put(authMiddleware, authManager, updateDataLimiter, updateQuantityBySize);
-productRouter.route("/update/:productId").put(updateDataLimiter, updatePriceById);
+productRouter.route("/update/:productId").put(authMiddleware, authManager, updateDataLimiter, updatePriceById);
 productRouter.route("/filter").get(getDataLimiter, filterProducts);
 productRouter.route("/filter/price").get(getDataLimiter, filterByPrice);
 

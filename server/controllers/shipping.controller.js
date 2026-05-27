@@ -70,7 +70,7 @@ export const updateShippingAddress = async (req, res) => {
   try {
     //Field input validation || Passed ✅
     if (!shippingId || !address_1 || !city || !state || !zipcode) {
-      return res.status({ message: "No shipping data provided" });
+      return res.status(400).json({ message: "No shipping data provided" });
     }
 
     //Address validation || Passed ✅
@@ -152,7 +152,8 @@ export const userShippingAddresses = async (req, res) => {
   try {
     const addresses = await pool.query(
       `
-            SELECT * FROM shipping_addresses
+            SELECT id, address_1, address_2, city, state, zipcode
+            FROM shipping_addresses
             WHERE user_id=$1
             `,
       [userId],

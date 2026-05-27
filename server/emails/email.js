@@ -375,7 +375,7 @@ const OrderConfirmationHtml = (order) => `
                 <tr>
                   <td>
                     <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#1a72c7;font-weight:700;">Order confirmed</p>
-                    <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#1a1a1a;line-height:1.2;">Thanks for your order, ${order.name}!</p>
+                    <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#1a1a1a;line-height:1.2;">Thanks for your order, ${order.recipient_name}!</p>
                     <p style="margin:0;font-size:12px;color:#888888;">A copy of this receipt was sent to <strong style="color:#1a1a1a;">${order.email}</strong></p>
                   </td>
                   <td align="right" valign="top">
@@ -400,7 +400,7 @@ const OrderConfirmationHtml = (order) => `
                         </td>
                         <td width="33%" style="vertical-align:top;">
                           <p style="margin:0 0 3px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#999999;">Est. Delivery</p>
-                          <p style="margin:0;font-size:13px;font-weight:700;color:#1a1a1a;">${order.estimatedDelivery}</p>
+                          <p style="margin:0;font-size:13px;font-weight:700;color:#1a1a1a;">${order.created_at * (5 * 24 * 60 * 60 * 1000)}</p>
                         </td>
                       </tr>
                     </table>
@@ -430,8 +430,8 @@ const OrderConfirmationHtml = (order) => `
                           <div style="width:44px;height:44px;background-color:#eeeeee;border-radius:3px;text-align:center;line-height:44px;font-size:22px;">👟</div>
                         </td>
                         <td style="padding-left:12px;vertical-align:middle;">
-                          <p style="margin:0 0 2px;font-size:13px;font-weight:600;color:#1a1a1a;">${item.name}</p>
-                          <p style="margin:0;font-size:11px;color:#999999;">Size US ${item.size} · ${item.color}</p>
+                          <p style="margin:0 0 2px;font-size:13px;font-weight:600;color:#1a1a1a;">${item.brand} ${item.name}</p>
+                          <p style="margin:0;font-size:11px;color:#999999;">Size US ${item.size} · ${item.colorway}</p>
                         </td>
                         <td align="right" style="vertical-align:middle;">
                           <p style="margin:0;font-size:13px;font-weight:700;color:#1a1a1a;">$${item.price.toFixed(2)}</p>
@@ -452,25 +452,25 @@ const OrderConfirmationHtml = (order) => `
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;">
                 <tr>
                   <td style="padding:4px 0;font-size:12px;color:#888888;">Subtotal</td>
-                  <td align="right" style="padding:4px 0;font-size:12px;color:#555555;">$${order.subtotal.toFixed(2)}</td>
+                  <td align="right" style="padding:4px 0;font-size:12px;color:#555555;">$${order.total_at_purchase.toFixed(2)}</td>
                 </tr>
                 ${
                   order.discount
                     ? `
                 <tr>
                   <td style="padding:4px 0;font-size:12px;color:#888888;">Discount (${order.discountCode})</td>
-                  <td align="right" style="padding:4px 0;font-size:12px;color:#2ecc40;font-weight:700;">−$${order.discount.toFixed(2)}</td>
+                  <td align="right" style="padding:4px 0;font-size:12px;color:#2ecc40;font-weight:700;">−$${order.discount ? order.discount.toFixed(2) : 0.0}</td>
                 </tr>
                 `
                     : ""
                 }
                 <tr>
                   <td style="padding:4px 0;font-size:12px;color:#888888;">Shipping</td>
-                  <td align="right" style="padding:4px 0;font-size:12px;color:#2ecc40;font-weight:700;">${order.shipping === 0 ? "Free" : "$" + order.shipping.toFixed(2)}</td>
+                  <td align="right" style="padding:4px 0;font-size:12px;color:#2ecc40;font-weight:700;">${order.shipping ? (order.shipping === 0 ? "Free" : "$" + order.shipping.toFixed(2)) : "Free"}</td>
                 </tr>
                 <tr>
                   <td style="padding-top:12px;border-top:1px solid #eeeeee;font-size:14px;font-weight:800;color:#1a1a1a;">Total</td>
-                  <td align="right" style="padding-top:12px;border-top:1px solid #eeeeee;font-size:14px;font-weight:800;color:#1a72c7;">$${order.total.toFixed(2)}</td>
+                  <td align="right" style="padding-top:12px;border-top:1px solid #eeeeee;font-size:14px;font-weight:800;color:#1a72c7;">$${order.total_at_purchase.toFixed(2)}</td>
                 </tr>
               </table>
             </td>
@@ -482,8 +482,8 @@ const OrderConfirmationHtml = (order) => `
           <tr>
             <td style="background-color:#ffffff;border-radius:4px;padding:24px 32px;">
               <p style="margin:0 0 16px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#1a72c7;font-weight:700;padding-bottom:10px;border-bottom:2px solid #1a72c7;">Shipping to</p>
-              <p style="margin:0 0 2px;font-size:13px;font-weight:600;color:#1a1a1a;">${order.name}</p>
-              <p style="margin:0 0 20px;font-size:13px;color:#888888;line-height:1.7;">${order.address}</p>
+              <p style="margin:0 0 2px;font-size:13px;font-weight:600;color:#1a1a1a;">${order.recipient_name}</p>
+              <p style="margin:0 0 20px;font-size:13px;color:#888888;line-height:1.7;">${order.ship_to.address_1}</p>
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
