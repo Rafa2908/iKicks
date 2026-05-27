@@ -628,15 +628,12 @@ export const generateInvoice = async (req, res) => {
             <span class="item-meta">${item.brand} · Size ${item.size} · ${item.colorway}</span>
           </div>
           <span>
-            <span class="mobile-label">Qty</span>
             ${item.quantity}
           </span>
           <span>
-            <span class="mobile-label">Unit Price</span>
             $${item.price_at_purchase}
           </span>
           <span>
-            <span class="mobile-label">Amount</span>
             $${(item.price_at_purchase * item.quantity).toFixed(2)}
           </span>
         </div>
