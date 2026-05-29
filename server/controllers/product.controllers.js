@@ -261,8 +261,7 @@ export const updateQuantityBySize = async (req, res) => {
 };
 
 export const updatePriceById = async (req, res) => {
-  const { productId } = req.params;
-  const { price } = req.body;
+  const { productId , price } = req.body;
 
   try {
     //Checks if price data is provided || Passed ✅
@@ -306,71 +305,50 @@ export const updatePriceById = async (req, res) => {
 };
 
 export const filterProducts = async (req, res) => {
-  const { input } = req.body;
+  const {name, brand, minPrice, maxPrice} = req.query;
 
   try {
-    if (!input) {
-      return res.status(400).json({ message: "Data not provided" });
+    const conditions = ['pi.is_primary=true']
+    const params = []
+    let count = 1;
+
+    if (brand) {
+      conditions.push(`p.brand ILIKE $${count++}`)
+      params.push(`%${brand}%`)
     }
 
-    const brands = await pool.query(
-      `
-      SELECT p.id, p.name, p.price, pi.url
-      FROM products p
-      JOIN product_image pi
-      ON p.id=pi.product_id
-      WHERE pi.is_primary=true
-      AND (brand ILIKE $1 OR name ILIKE $1)
-      `,
-      [`%${input}%`],
-    );
-
-    //Checks if brand exists || Passed ✅
-    if (brands.rowCount === 0) {
-      return res.status(400).json({ message: "No product available" });
+    if (name) {
+      conditions.push(`p.name ILIKE $${count++}`)
+      params.push(`%${name}%`)
     }
 
-    return res.status(200).json(brands.rows);
+    if (minPrice && maxPrice) {
+      conditions.push(`p.price BETWEEN $${count++} AND $${count++}`)
+      params.push(Number(minPrice), Number(maxPrice))
+    }
+
+    const query = `
+      SELECT p.id, p.name, p.brand, p.price, pi.url
+        FROM products p
+        JOIN product_image pi
+        ON p.id=pi.product_id
+        WHERE ${conditions.join(' AND ')}
+        ORDER BY p.price ASC
+    `
+    
+    const products = await pool.query(query, params);
+
+    if (products.rowCount === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    return res.status(200).json(products.rows)
+
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    console.error(error.message);
+    
+    return res.status(500).json({message: "Internal server error"})
   }
 };
 
-export const filterByPrice = async (req, res) => {
-  const { minPrice, maxPrice } = req.query;
 
-  try {
-    if (!minPrice || !maxPrice) {
-      return res.status(400).json({ message: "Price range not provided" });
-    }
-
-    if (isNaN(minPrice) || isNaN(maxPrice)) {
-      return res.status(400).json({ message: "Enter a numerical value" });
-    }
-    const product = await pool.query(
-      `
-      SELECT p.id, p.name, p.price, pi.url
-      FROM products p
-      JOIN product_image pi
-      ON p.id=pi.product_id
-      WHERE pi.is_primary=true
-      AND price BETWEEN $1 AND $2
-      `,
-      [minPrice, maxPrice],
-    );
-
-    if (product.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ message: "No product available within this range" });
-    }
-
-    return res.status(200).json(product.rows);
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
