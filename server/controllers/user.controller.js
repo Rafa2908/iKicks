@@ -63,7 +63,7 @@ export const registerUser = async (req, res) => {
     const newUser = await pool.query(
       `
       INSERT INTO users(first_name, last_name, email, password)
-      VALUES($1, $2, $3, $4) RETURNING email, id, first_name
+      VALUES($1, $2, $3, $4) RETURNING email, id, first_name, role
       `,
       [firstName, lastName, email, hashedPassword],
     );
@@ -98,7 +98,12 @@ export const registerUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(201).json({ message: "Registration successful" });
+    return res.status(201).json({
+      message: "Registration successful",
+      userId: newUser.rows[0].id,
+      email: newUser.rows[0].email,
+      role: newUser.rows[0].role,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -162,7 +167,12 @@ export const loginUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).json({ message: "Logged in successfully" });
+    return res.status(200).json({
+      message: "Logged in successfully",
+      userId: potentialUser.rows[0].id,
+      email: potentialUser.rows[0].email,
+      role: potentialUser.rows[0].role,
+    });
   } catch (error) {
     console.error(error);
 
