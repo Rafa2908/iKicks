@@ -5,6 +5,7 @@ import {
   deactivateUserAccount,
   generateCode,
   getAllUsers,
+  getMe,
   getUserById,
   loginUser,
   logoutUser,
@@ -34,15 +35,16 @@ userRouter
 userRouter.route("/register").post(authLimiter, registerUser);
 userRouter.route("/login").post(authLimiter, loginUser);
 userRouter.route("/logout").post(authLimiter, logoutUser);
+userRouter.route("/me").get(authLimiter, getMe);
 userRouter
-  .route("/:userId")
+  .route("/profile")
   .get(authMiddleware, getDataLimiter, getUserById)
   .put(authMiddleware, updateDataLimiter, updateUserInfo);
 userRouter
-  .route("/deactivate/:userId")
+  .route("/deactivate")
   .put(authMiddleware, accountStatusLimiter, deactivateUserAccount);
 userRouter
-  .route("/activate/:userId")
+  .route("/activate")
   .put(authMiddleware, accountStatusLimiter, activateUserAccount);
 
 //Password Reset

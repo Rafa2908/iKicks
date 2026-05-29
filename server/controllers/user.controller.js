@@ -186,6 +186,12 @@ export const logoutUser = (req, res) => {
   return res.status(200).json({ message: "Logout successfully" });
 };
 
+export const getMe = async (req, res) => {
+  const { userId, email, role } = req.user;
+
+  return res.status(200).json({ userId, email, role });
+};
+
 export const getAllUsers = async (req, res) => {
   try {
     const users = await pool.query(`
@@ -261,13 +267,9 @@ export const updateUserInfo = async (req, res) => {
 };
 
 export const activateUserAccount = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
 
   try {
-    if (!userId || isNaN(Number(userId))) {
-      return res.status(400).json({ message: "Invalid data" });
-    }
-
     const update = await pool.query(
       `
       UPDATE users SET is_active=true WHERE id=$1 RETURNING id
@@ -290,13 +292,9 @@ export const activateUserAccount = async (req, res) => {
 };
 
 export const deactivateUserAccount = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
 
   try {
-    if (!userId || isNaN(Number(userId))) {
-      return res.status(400).json({ message: "Invalid data" });
-    }
-
     const update = await pool.query(
       `
       UPDATE users SET is_active=false WHERE id=$1 RETURNING id
