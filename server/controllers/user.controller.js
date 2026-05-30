@@ -81,7 +81,11 @@ export const registerUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: newUser.rows[0].id, email: newUser.rows[0].email },
+      {
+        userId: newUser.rows[0].id,
+        email: newUser.rows[0].email,
+        role: newUser.rows[0].role,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -187,9 +191,26 @@ export const logoutUser = (req, res) => {
 };
 
 export const getMe = async (req, res) => {
-  const { userId, email, role } = req.user;
+  if (!req.user) {
+    return res.status(401).json({ message: "Not authorized." });
+  }
+  const { userId } = req.user;
 
-  return res.status(200).json({ userId, email, role });
+  try {
+    const user = await pool.query(
+      `SELECT id, first_name, last_name, email, role FROM users WHERE id=$1`,
+      [userId],
+    );
+
+    if (user.rowCount === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(user.rows[0]);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const getAllUsers = async (req, res) => {

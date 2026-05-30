@@ -3,148 +3,172 @@ import Abovenav from "../abovenav/Abovenav";
 import Belownav from "../belownav/Belownav";
 import Promo from "../promo/Promo";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import { CartContext } from "../../context/CartContext";
-import { getSneakerByBrand, getUserById } from "../../service/client.service";
+import { useState, useContext, useRef, useEffect } from "react";
+import { UserContext } from "../../context/UserContext";
 
 const NavBar = () => {
-  const cartContext = useContext(CartContext);
-  const {
-    setUserInfo,
-    userInfo,
-    setToken,
-    token,
-    setAlertColor,
-    setMessage,
-    cartDetails,
-    setCartDetails,
-    setButtonColor,
-    setSneakersByBrand,
-  } = cartContext;
-
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken.trim());
-    }
-  }, [setToken]);
+  const { user, setUser } = useContext(UserContext);
+  const isLoggedIn = user && Object.keys(user).length > 0;
 
   useEffect(() => {
-    if (token) {
-      getUserById(token)
-        .then((res) => setUserInfo(res))
-        .catch((error) => console.log(error));
-    }
-  }, [token, setUserInfo]);
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("cart");
-    setCartDetails([]);
-    setMessage("You have logged out successfully.");
-    setAlertColor("alert-warning");
-    setButtonColor("warning");
-    setToken("");
+    setUser({});
+    setDropdownOpen(false);
     navigate("/");
-  };
-
-  const handleInputChange = (e) => {
-    setInputText(e.target.value);
-  };
-
-  const sneakerBrandHandler = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    getSneakerByBrand(inputText)
-      .then((res) => {
-        setSneakersByBrand(res);
-        setTimeout(() => {
-          setLoading(false);
-          navigate("/brand");
-        }, 1000);
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-      });
-    setInputText("");
   };
 
   return (
     <>
       <Abovenav />
+
       {loading && (
-        <div className={`overlay ${loading ? "show" : ""}`}>
-          <div className="spinner"></div>
+        <div className="ikicks-spinner-overlay">
+          <div className="ikicks-spinner" />
         </div>
       )}
-      <nav className="d-flex justify-content-between align-items-center p-4 bg-dark sticky-top">
-        <div className="left-section">
-          <h1 className="text-light">
-            <Link to="/" className="text-home">
-              Kicks District
-            </Link>
-          </h1>
+
+      <nav className="ikicks-nav">
+        {/* Brand */}
+        <Link to="/" className="nav-brand">
+          iKicks
+        </Link>
+
+        {/* Search — hidden on mobile, visible in mobile menu */}
+        <div className="nav-search">
+          <input
+            type="text"
+            placeholder="Search sneakers..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+          />
+          <button type="button" className="nav-search-btn" aria-label="Search">
+            <i className="fa-solid fa-magnifying-glass" />
+          </button>
         </div>
-        <div className="middle-section">
-          <form onSubmit={sneakerBrandHandler}>
+
+        {/* Right actions */}
+        <div className="nav-actions">
+          {/* Home — hidden on mobile */}
+          <Link to="/" className="nav-icon-link nav-home-link" title="Home">
+            <i className="fa-solid fa-house" />
+          </Link>
+
+          {/* User — hidden on mobile, shown via hamburger menu */}
+          <div className="nav-user" ref={dropdownRef}>
+            {isLoggedIn ? (
+              <>
+                <button
+                  className="nav-icon-btn"
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  title="Account"
+                  aria-expanded={dropdownOpen}
+                >
+                  <i className="fa-solid fa-circle-user" />
+                </button>
+
+                <div className={`nav-dropdown ${dropdownOpen ? "open" : ""}`}>
+                  <Link to="/profile" onClick={() => setDropdownOpen(false)}>
+                    <i className="fa-regular fa-user" /> Profile
+                  </Link>
+                  <Link to="/myorders" onClick={() => setDropdownOpen(false)}>
+                    <i className="fa-solid fa-box" /> My Orders
+                  </Link>
+                  <button className="nav-dropdown-logout" onClick={logout}>
+                    <i className="fa-solid fa-right-from-bracket" /> Logout
+                  </button>
+                </div>
+              </>
+            ) : (
+              <Link to="/login" className="nav-icon-link" title="Log in">
+                <i className="fa-regular fa-user" />
+              </Link>
+            )}
+          </div>
+
+          {/* Cart — always visible */}
+          <Link to="/cart" className="nav-icon-link nav-cart" title="Cart">
+            <i className="fa-solid fa-cart-shopping" />
+            <span className="nav-cart-badge">0</span>
+          </Link>
+
+          {/* Hamburger — mobile only */}
+          <button
+            className={`nav-hamburger ${mobileOpen ? "open" : ""}`}
+            onClick={() => setMobileOpen((prev) => !prev)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+
+        {/* Mobile slide-down menu */}
+        <div className={`nav-mobile-menu ${mobileOpen ? "open" : ""}`}>
+          <div className="nav-mobile-search">
             <input
               type="text"
-              name="brand"
-              id="search"
-              placeholder="Search here..."
+              placeholder="Search sneakers..."
               value={inputText}
-              onChange={handleInputChange}
+              onChange={(e) => setInputText(e.target.value)}
             />
-            <button type="submit" className="btn">
-              <i className="fa-solid fa-magnifying-glass"></i>
+            <button type="button" aria-label="Search">
+              <i className="fa-solid fa-magnifying-glass" />
             </button>
-          </form>
-        </div>
-        <div className="right-section">
-          <Link to="/">
-            <i className="fa-solid fa-house" title="Home Page"></i>
-          </Link>
-          {token && userInfo?.email === "jose@admin.com" ? (
-            <Link to="/admin">
-              <i className="fa-solid fa-user-tie" title="Admin Panel"></i>
+          </div>
+
+          <div className="nav-mobile-links">
+            <Link to="/" onClick={() => setMobileOpen(false)}>
+              <i className="fa-solid fa-house" /> Home
             </Link>
-          ) : token ? (
-            <div>
-              <i
-                className="fa-solid text-primary fa-user dropdown-icon"
-                title="User"
-              >
-                <ul className="dropdown-list">
-                  <li>Profile</li>
-                  <li onClick={logout}>Logout</li>
-                </ul>
-              </i>
-            </div>
-          ) : (
-            <Link to="/register">
-              <i className="fa-solid fa-user text-light" title="Register"></i>
-            </Link>
-          )}
-          {token ? (
-            <Link to="/wishlist">
-              <i className="fa-regular fa-heart" title="Wishlist"></i>
-            </Link>
-          ) : null}
-          <Link to="/cart">
-            <i className="fa-solid fa-cart-shopping" title="Cart">
-              {cartDetails.length > 0 ? (
-                <span>{cartDetails.length}</span>
-              ) : null}
-            </i>
-          </Link>
+
+            {isLoggedIn ? (
+              <>
+                <Link to="/profile" onClick={() => setMobileOpen(false)}>
+                  <i className="fa-regular fa-user" /> Profile
+                </Link>
+                <Link to="/myorders" onClick={() => setMobileOpen(false)}>
+                  <i className="fa-solid fa-box" /> My Orders
+                </Link>
+                <button
+                  className="nav-mobile-logout"
+                  onClick={() => { logout(); setMobileOpen(false); }}
+                >
+                  <i className="fa-solid fa-right-from-bracket" /> Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setMobileOpen(false)}>
+                  <i className="fa-regular fa-user" /> Log In
+                </Link>
+                <Link to="/register" onClick={() => setMobileOpen(false)}>
+                  <i className="fa-solid fa-user-plus" /> Create Account
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </nav>
+
       <Belownav />
       <Promo />
     </>

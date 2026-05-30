@@ -1,12 +1,8 @@
-import { useContext, useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  loginUser,
-  getCart,
-  getUserById,
-  getSneakerById,
-} from "../../service/client.service";
-import { CartContext } from "../../context/CartContext";
+import { loginUser } from "../../service/user.service";
+import { UserContext } from "../../context/UserContext";
+import "./Registration.css";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -14,136 +10,119 @@ const LoginForm = () => {
     password: "",
   });
 
-  const cartContext = useContext(CartContext);
-
-  const {
-    setMessage,
-    setAlertColor,
-    setToken,
-    setCart,
-    setCartDetails,
-    setUserInfo,
-    setButtonColor,
-  } = cartContext;
-
-  const [frontErrors, setFrontErrors] = useState({
-    email: true,
-    password: true,
-  });
-
-  const [backErrors, setBackErrors] = useState({});
-
-  const formValidations = (name, value) => {
-    const validation = {
-      email: (value) => {
-        if (value.length === 0) {
-          return "Email is required";
-        }
-        return true;
-      },
-      password: (value) => {
-        if (value.length === 0) {
-          return "Password is required";
-        } else if (value.length < 8) {
-          return "Password must be at least 8 characters long.";
-        }
-        return true;
-      },
-    };
-    setFrontErrors((prev) => ({ ...prev, [name]: validation[name](value) }));
-  };
-
+  const { setUser, setMessage } = useContext(UserContext);
   const navigate = useNavigate();
+
+  const [frontErrors, setFrontErrors] = useState({});
+  const [backErrors, setBackErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validators = {
+    email: (v) => {
+      if (!v.length) return "Email is required.";
+    },
+    password: (v) => {
+      if (!v.length) return "Password is required.";
+      if (v.length < 8) return "Must be at least 8 characters.";
+    },
+  };
 
   const updateLoginHandler = (e) => {
     const { name, value } = e.target;
-    formValidations(name, value);
+    setFrontErrors((prev) => ({ ...prev, [name]: validators[name](value) }));
     setFormData((prev) => ({ ...prev, [name]: value }));
     setBackErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const fetchCartItemsDetails = async (cartData) => {
-    const itemDetails = await Promise.all(
-      Object.keys(cartData).map(async (id) => {
-        const item = await getSneakerById(id);
-        return { ...item, quantity: cartData[id] };
-      })
-    );
-    return itemDetails;
+  const validateAll = () => {
+    const errors = {};
+    for (const field in validators) {
+      const error = validators[field](formData[field]);
+      if (error) errors[field] = error;
+    }
+    setFrontErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const loginUserHandler = async (e) => {
     e.preventDefault();
+    if (!validateAll()) return;
+    setIsSubmitting(true);
     try {
       const res = await loginUser(formData);
-      if (res.success) {
-        setToken(res.token);
-        localStorage.setItem("token", res.token);
-
-        const userInfo = await getUserById(res.token);
-        setUserInfo(userInfo);
-
-        const cartData = await getCart(res.token);
-        setCart(cartData.cartData);
-
-        const cartDetails = await fetchCartItemsDetails(cartData.cartData);
-        setCartDetails(cartDetails);
-
+      if (res) {
+        setUser(res);
+        setMessage("Welcome back!");
         navigate("/");
-        setMessage(`You have logged in successfully.`);
-        setAlertColor("alert-success");
-        setButtonColor("success");
-      } else {
-        alert(res.message);
       }
     } catch (error) {
       console.error(error);
-      if (error.response && error.response.data) {
-        setBackErrors(error.response.data.errors);
-        setMessage("Failed to retrieve cart details.");
-        setAlertColor("alert-danger");
-      } else {
-        setMessage("Failed to log in. Please try again later.");
-        setAlertColor("alert-danger");
-      }
+      setBackErrors(error?.response?.data || {});
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const hasBackErrors = Object.keys(backErrors).length > 0;
+
   return (
-    <div className="card shadow w-25 mx-auto mt-5 mb-5 p-3">
-      <h1 className="text-center mt-4 mb-4">Log in</h1>
-      <form className="card-body" onSubmit={loginUserHandler}>
-        <div className="form-floating mb-3">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address:"
-            className="form-control"
-            onChange={updateLoginHandler}
-          />
-          <p className="text-danger">{frontErrors.email}</p>
-          <p className="text-danger">{backErrors.email?.message}</p>
-          <label htmlFor="email">Email Address:</label>
-        </div>
-        <div className="form-floating mb-3">
-          <input
-            type="password"
-            name="password"
-            placeholder="Password:"
-            className="form-control"
-            onChange={updateLoginHandler}
-          />
-          <p className="text-danger">{frontErrors.password}</p>
-          <p className="text-danger">{backErrors.password?.message}</p>
-          <label htmlFor="email">Password:</label>
-        </div>
-        <button className="btn btn-sm btn-outline-primary mb-2 mt-3">
-          Log in
+    <div className="reg-overlay">
+      <div className="reg-card">
+        <button className="reg-close" onClick={() => navigate(-1)} aria-label="Close">
+          ×
         </button>
-        <p>
-          New to Kicks District? <Link to={"/register"}>Register</Link>
+
+        <div className="reg-header">
+          <h1 className="reg-brand">iKicks</h1>
+          <p className="reg-subtitle">Welcome back, Sneakerhead</p>
+        </div>
+
+        {hasBackErrors && (
+          <div className="reg-back-errors">
+            {Object.values(backErrors).map((err, i) => (
+              <p key={i}>{err?.message || err}</p>
+            ))}
+          </div>
+        )}
+
+        <form className="reg-form" onSubmit={loginUserHandler} noValidate>
+          <div className="reg-field">
+            <label htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="john@example.com"
+              className={frontErrors.email ? "has-error" : ""}
+              onChange={updateLoginHandler}
+              value={formData.email}
+            />
+            <span className="reg-error">{frontErrors.email}</span>
+          </div>
+
+          <div className="reg-field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="Min. 8 characters"
+              className={frontErrors.password ? "has-error" : ""}
+              onChange={updateLoginHandler}
+              value={formData.password}
+            />
+            <span className="reg-error">{frontErrors.password}</span>
+          </div>
+
+          <button type="submit" className="reg-submit" disabled={isSubmitting}>
+            {isSubmitting ? "Logging in..." : "Log In"}
+          </button>
+        </form>
+
+        <p className="reg-footer">
+          New to iKicks? <Link to="/register">Create an account</Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 };

@@ -3,11 +3,27 @@
   justify-content: space-around;
   align-items: center;
   background-color: rgba(243, 238, 238, 0.87);
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 16px;
 }
 
 .above p {
   margin-top: 15px;
   font-size: 1.4rem;
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .above p {
+    font-size: 0.8rem;
+    margin-top: 8px;
+  }
+
+  .above .link {
+    font-size: 0.8rem;
+  }
 }
 
 .link {

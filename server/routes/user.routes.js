@@ -35,7 +35,7 @@ userRouter
 userRouter.route("/register").post(authLimiter, registerUser);
 userRouter.route("/login").post(authLimiter, loginUser);
 userRouter.route("/logout").post(authLimiter, logoutUser);
-userRouter.route("/me").get(authLimiter, getMe);
+userRouter.route("/me").get(authMiddleware, authLimiter, getMe);
 userRouter
   .route("/profile")
   .get(authMiddleware, getDataLimiter, getUserById)
