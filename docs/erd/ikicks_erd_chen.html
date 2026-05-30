@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iKicks ERD — Chen Notation</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --border: #2a2a2a;
+    --accent: #c8f044;
+    --accent2: #44d4f0;
+    --text: #e8e8e8;
+    --muted: #666;
+    --entity-bg: #1a1a1a;
+    --entity-border: #c8f044;
+    --rel-bg: #1a1a1a;
+    --rel-border: #44d4f0;
+    --attr-bg: #111;
+    --attr-border: #3a3a3a;
+    --line: #333;
+    --pk-color: #c8f044;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    padding: 40px 32px;
+    min-height: 100vh;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+    align-items: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .legend-box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--entity-border);
+    background: var(--entity-bg);
+  }
+
+  .legend-diamond {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--rel-border);
+    background: var(--rel-bg);
+    transform: rotate(45deg);
+  }
+
+  .legend-oval {
+    width: 18px;
+    height: 12px;
+    border: 1px solid var(--attr-border);
+    background: var(--attr-bg);
+    border-radius: 50%;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding-left: 4px;
+    border-left: 2px solid var(--accent);
+    padding-left: 8px;
+  }
+
+  .diagram-section {
+    margin-bottom: 60px;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  /* Entity rectangle */
+  .entity-rect {
+    fill: var(--entity-bg);
+    stroke: var(--entity-border);
+    stroke-width: 1.5;
+  }
+
+  /* Relationship diamond */
+  .rel-diamond {
+    fill: var(--rel-bg);
+    stroke: var(--rel-border);
+    stroke-width: 1.5;
+  }
+
+  /* Attribute oval */
+  .attr-oval {
+    fill: var(--attr-bg);
+    stroke: var(--attr-border);
+    stroke-width: 1;
+  }
+
+  /* PK underlined attribute oval */
+  .attr-oval-pk {
+    fill: #161a0e;
+    stroke: var(--pk-color);
+    stroke-width: 1;
+  }
+
+  /* Connector lines */
+  .conn {
+    stroke: var(--line);
+    stroke-width: 1;
+    fill: none;
+  }
+
+  /* Entity label */
+  .entity-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--accent);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  /* Relationship label */
+  .rel-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    fill: var(--accent2);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  /* Attribute label */
+  .attr-label {
+    font-family: 'IBM Plex Sans', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    fill: #aaa;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  /* PK attribute label */
+  .attr-label-pk {
+    font-family: 'IBM Plex Sans', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    fill: var(--pk-color);
+    text-anchor: middle;
+    dominant-baseline: central;
+    text-decoration: underline;
+  }
+
+  /* Cardinality label */
+  .card-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    fill: #555;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>iKicks</h1>
+  <span class="subtitle">ERD — Chen Notation</span>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box"></div> Entity</div>
+    <div class="legend-item"><div class="legend-diamond"></div> Relationship</div>
+    <div class="legend-item"><div class="legend-oval"></div> Attribute</div>
+  </div>
+</header>
+
+<!-- ===== SECTION 1: Users, Cart, Cart_items ===== -->
+<div class="diagram-section">
+  <div class="section-label">Section 1 — Users &amp; Cart</div>
+  <svg viewBox="0 0 1100 560" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- ===== USERS entity ===== -->
+    <!-- Entity box -->
+    <rect class="entity-rect" x="390" y="220" width="140" height="50" rx="3"/>
+    <text class="entity-label" x="460" y="245">USERS</text>
+
+    <!-- Attributes radiating out -->
+    <!-- id (PK) - top -->
+    <line class="conn" x1="460" y1="220" x2="460" y2="150"/>
+    <ellipse class="attr-oval-pk" cx="460" cy="130" rx="34" ry="18"/>
+    <text class="attr-label-pk" x="460" y="130">id</text>
+
+    <!-- first_name - top left -->
+    <line class="conn" x1="415" y1="222" x2="320" y2="155"/>
+    <ellipse class="attr-oval" cx="290" cy="138" rx="44" ry="18"/>
+    <text class="attr-label" x="290" y="138">first_name</text>
+
+    <!-- last_name - top right -->
+    <line class="conn" x1="505" y1="222" x2="600" y2="155"/>
+    <ellipse class="attr-oval" cx="634" cy="138" rx="44" ry="18"/>
+    <text class="attr-label" x="634" y="138">last_name</text>
+
+    <!-- email - right -->
+    <line class="conn" x1="530" y1="245" x2="620" y2="245"/>
+    <ellipse class="attr-oval" cx="658" cy="245" rx="36" ry="18"/>
+    <text class="attr-label" x="658" y="245">email</text>
+
+    <!-- password - bottom right -->
+    <line class="conn" x1="505" y1="268" x2="580" y2="320"/>
+    <ellipse class="attr-oval" cx="614" cy="334" rx="44" ry="18"/>
+    <text class="attr-label" x="614" y="334">password</text>
+
+    <!-- role - bottom -->
+    <line class="conn" x1="460" y1="270" x2="460" y2="330"/>
+    <ellipse class="attr-oval" cx="460" cy="348" rx="30" ry="18"/>
+    <text class="attr-label" x="460" y="348">role</text>
+
+    <!-- created_at - bottom left -->
+    <line class="conn" x1="415" y1="268" x2="340" y2="320"/>
+    <ellipse class="attr-oval" cx="304" cy="334" rx="44" ry="18"/>
+    <text class="attr-label" x="304" y="334">created_at</text>
+
+    <!-- ===== CART entity ===== -->
+    <rect class="entity-rect" x="70" y="220" width="120" height="50" rx="3"/>
+    <text class="entity-label" x="130" y="245">CART</text>
+
+    <!-- id (PK) -->
+    <line class="conn" x1="130" y1="220" x2="130" y2="150"/>
+    <ellipse class="attr-oval-pk" cx="130" cy="132" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="130" y="132">id</text>
+
+    <!-- created_at -->
+    <line class="conn" x1="80" y1="258" x2="46" y2="310"/>
+    <ellipse class="attr-oval" cx="46" cy="328" rx="44" ry="18"/>
+    <text class="attr-label" x="46" y="328">created_at</text>
+
+    <!-- Users —< has >— Cart relationship -->
+    <!-- Line from Users to relationship diamond -->
+    <line class="conn" x1="390" y1="245" x2="310" y2="245"/>
+    <!-- Diamond -->
+    <polygon class="rel-diamond" points="285,245 310,230 335,245 310,260"/>
+    <text class="rel-label" x="310" y="245">has</text>
+    <!-- Line from diamond to Cart -->
+    <line class="conn" x1="285" y1="245" x2="190" y2="245"/>
+    <!-- Cardinality -->
+    <text class="card-label" x="368" y="238">1</text>
+    <text class="card-label" x="220" y="238">N</text>
+
+    <!-- ===== CART_ITEMS relationship diamond ===== -->
+    <!-- Between Cart and Product_size (Product_size is in section 2 but we show the diamond) -->
+    <line class="conn" x1="130" y1="270" x2="130" y2="390"/>
+    <polygon class="rel-diamond" points="130,390 155,410 130,430 105,410"/>
+    <text class="rel-label" x="130" y="410">contains</text>
+
+    <!-- cart_items attributes -->
+    <!-- price_at_add -->
+    <line class="conn" x1="105" y1="425" x2="46" y2="470"/>
+    <ellipse class="attr-oval" cx="46" cy="488" rx="48" ry="18"/>
+    <text class="attr-label" x="46" y="488">price_at_add</text>
+
+    <!-- quantity -->
+    <line class="conn" x1="130" y1="430" x2="130" y2="480"/>
+    <ellipse class="attr-oval" cx="130" cy="498" rx="38" ry="18"/>
+    <text class="attr-label" x="130" y="498">quantity</text>
+
+    <!-- size_id FK -->
+    <line class="conn" x1="155" y1="425" x2="210" y2="470"/>
+    <ellipse class="attr-oval" cx="244" cy="488" rx="40" ry="18"/>
+    <text class="attr-label" x="244" y="488">size_id (FK)</text>
+
+    <!-- Arrow pointing right indicating connection to Product_size -->
+    <line class="conn" x1="260" y1="410" x2="340" y2="410" marker-end="url(#arrow-muted)"/>
+    <text class="card-label" x="300" y="402">to PRODUCT_SIZE</text>
+
+    <defs>
+      <marker id="arrow-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- Users to Orders note -->
+    <line class="conn" x1="530" y1="245" x2="700" y2="245" marker-end="url(#arrow-muted)"/>
+    <text class="card-label" x="720" y="248">to ORDERS (Section 2)</text>
+
+    <!-- Users to Shipping note -->
+    <line class="conn" x1="530" y1="258" x2="700" y2="290" marker-end="url(#arrow-muted)"/>
+    <text class="card-label" x="720" y="293">to SHIPPING (Section 3)</text>
+
+    <!-- Users to Wishlist note -->
+    <line class="conn" x1="530" y1="265" x2="700" y2="330" marker-end="url(#arrow-muted)"/>
+    <text class="card-label" x="720" y="333">to WISHLIST (Section 3)</text>
+
+  </svg>
+</div>
+
+<!-- ===== SECTION 2: Products, Product_size, Product_image, Orders, Order_items, Transactions ===== -->
+<div class="diagram-section">
+  <div class="section-label">Section 2 — Products &amp; Orders</div>
+  <svg viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- ===== PRODUCTS entity ===== -->
+    <rect class="entity-rect" x="100" y="290" width="140" height="50" rx="3"/>
+    <text class="entity-label" x="170" y="315">PRODUCTS</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="170" y1="290" x2="170" y2="220"/>
+    <ellipse class="attr-oval-pk" cx="170" cy="202" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="170" y="202">id</text>
+
+    <!-- name -->
+    <line class="conn" x1="112" y1="292" x2="56" y2="220"/>
+    <ellipse class="attr-oval" cx="46" cy="202" rx="34" ry="18"/>
+    <text class="attr-label" x="46" y="202">name</text>
+
+    <!-- brand -->
+    <line class="conn" x1="100" y1="305" x2="36" y2="280"/>
+    <ellipse class="attr-oval" cx="20" cy="265" rx="34" ry="18"/>
+    <text class="attr-label" x="20" y="265">brand</text>
+
+    <!-- price -->
+    <line class="conn" x1="100" y1="325" x2="36" y2="325"/>
+    <ellipse class="attr-oval" cx="20" cy="325" rx="28" ry="18"/>
+    <text class="attr-label" x="20" y="325">price</text>
+
+    <!-- description -->
+    <line class="conn" x1="100" y1="340" x2="36" y2="380"/>
+    <ellipse class="attr-oval" cx="20" cy="396" rx="44" ry="18"/>
+    <text class="attr-label" x="20" y="396">description</text>
+
+    <!-- colorway -->
+    <line class="conn" x1="112" y1="338" x2="56" y2="400"/>
+    <ellipse class="attr-oval" cx="56" cy="418" rx="40" ry="18"/>
+    <text class="attr-label" x="56" y="418">colorway</text>
+
+    <!-- category -->
+    <line class="conn" x1="170" y1="340" x2="170" y2="400"/>
+    <ellipse class="attr-oval" cx="170" cy="418" rx="38" ry="18"/>
+    <text class="attr-label" x="170" y="418">category</text>
+
+    <!-- ===== PRODUCT_SIZE weak entity ===== -->
+    <rect class="entity-rect" x="370" y="290" width="140" height="50" rx="3" stroke-dasharray="4 2"/>
+    <rect x="374" y="294" width="132" height="42" rx="2" fill="none" stroke="#c8f044" stroke-width="0.5" stroke-dasharray="4 2"/>
+    <text class="entity-label" x="440" y="315">PRODUCT_SIZE</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="440" y1="290" x2="440" y2="220"/>
+    <ellipse class="attr-oval-pk" cx="440" cy="202" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="440" y="202">id</text>
+
+    <!-- size -->
+    <line class="conn" x1="488" y1="292" x2="530" y2="230"/>
+    <ellipse class="attr-oval" cx="546" cy="214" rx="28" ry="18"/>
+    <text class="attr-label" x="546" y="214">size</text>
+
+    <!-- quantity -->
+    <line class="conn" x1="510" y1="310" x2="570" y2="290"/>
+    <ellipse class="attr-oval" cx="598" cy="280" rx="36" ry="18"/>
+    <text class="attr-label" x="598" y="280">quantity</text>
+
+    <!-- Products —< has >— Product_size -->
+    <line class="conn" x1="240" y1="315" x2="298" y2="315"/>
+    <polygon class="rel-diamond" points="298,315 323,300 348,315 323,330"/>
+    <text class="rel-label" x="323" y="315">has</text>
+    <line class="conn" x1="348" y1="315" x2="370" y2="315"/>
+    <text class="card-label" x="262" y="308">1</text>
+    <text class="card-label" x="356" y="308">N</text>
+
+    <!-- ===== PRODUCT_IMAGE entity ===== -->
+    <rect class="entity-rect" x="370" y="480" width="140" height="50" rx="3"/>
+    <text class="entity-label" x="440" y="505">PRODUCT_IMAGE</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="410" y1="530" x2="370" y2="580"/>
+    <ellipse class="attr-oval-pk" cx="348" cy="596" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="348" y="596">id</text>
+
+    <!-- url -->
+    <line class="conn" x1="440" y1="530" x2="440" y2="580"/>
+    <ellipse class="attr-oval" cx="440" cy="598" rx="24" ry="18"/>
+    <text class="attr-label" x="440" y="598">url</text>
+
+    <!-- is_primary -->
+    <line class="conn" x1="470" y1="530" x2="510" y2="580"/>
+    <ellipse class="attr-oval" cx="532" cy="596" rx="40" ry="18"/>
+    <text class="attr-label" x="532" y="596">is_primary</text>
+
+    <!-- Products —< has >— Product_image -->
+    <line class="conn" x1="440" y1="340" x2="440" y2="398"/>
+    <polygon class="rel-diamond" points="440,398 465,415 440,432 415,415"/>
+    <text class="rel-label" x="440" y="415">has</text>
+    <line class="conn" x1="440" y1="432" x2="440" y2="480"/>
+    <text class="card-label" x="448" y="362">1</text>
+    <text class="card-label" x="448" y="462">N</text>
+
+    <!-- ===== ORDERS entity ===== -->
+    <rect class="entity-rect" x="800" y="290" width="130" height="50" rx="3"/>
+    <text class="entity-label" x="865" y="315">ORDERS</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="865" y1="290" x2="865" y2="220"/>
+    <ellipse class="attr-oval-pk" cx="865" cy="202" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="865" y="202">id</text>
+
+    <!-- total_at_purchase -->
+    <line class="conn" x1="930" y1="300" x2="990" y2="240"/>
+    <ellipse class="attr-oval" cx="1020" cy="224" rx="58" ry="18"/>
+    <text class="attr-label" x="1020" y="224">total_at_purchase</text>
+
+    <!-- status -->
+    <line class="conn" x1="930" y1="315" x2="1000" y2="315"/>
+    <ellipse class="attr-oval" cx="1036" cy="315" rx="34" ry="18"/>
+    <text class="attr-label" x="1036" y="315">status</text>
+
+    <!-- phone_number -->
+    <line class="conn" x1="930" y1="330" x2="990" y2="380"/>
+    <ellipse class="attr-oval" cx="1030" cy="396" rx="52" ry="18"/>
+    <text class="attr-label" x="1030" y="396">phone_number</text>
+
+    <!-- recipient_name -->
+    <line class="conn" x1="865" y1="340" x2="865" y2="400"/>
+    <ellipse class="attr-oval" cx="865" cy="418" rx="54" ry="18"/>
+    <text class="attr-label" x="865" y="418">recipient_name</text>
+
+    <!-- ===== ORDER_ITEMS relationship ===== -->
+    <!-- Product_size to Order_items diamond -->
+    <line class="conn" x1="510" y1="315" x2="570" y2="315"/>
+    <polygon class="rel-diamond" points="570,315 595,300 620,315 595,330"/>
+    <text class="rel-label" x="595" y="308">order</text>
+    <text class="rel-label" x="595" y="322">items</text>
+    <line class="conn" x1="620" y1="315" x2="800" y2="315"/>
+    <text class="card-label" x="540" y="308">N</text>
+    <text class="card-label" x="780" y="308">N</text>
+
+    <!-- order_items attributes -->
+    <line class="conn" x1="595" y1="330" x2="595" y2="400"/>
+    <ellipse class="attr-oval" cx="595" cy="418" rx="38" ry="18"/>
+    <text class="attr-label" x="595" y="412">price_at</text>
+    <text class="attr-label" x="595" y="424">purchase</text>
+
+    <line class="conn" x1="610" y1="330" x2="660" y2="390"/>
+    <ellipse class="attr-oval" cx="678" cy="408" rx="36" ry="18"/>
+    <text class="attr-label" x="678" y="408">quantity</text>
+
+    <!-- ===== TRANSACTIONS entity ===== -->
+    <rect class="entity-rect" x="800" y="480" width="140" height="50" rx="3"/>
+    <text class="entity-label" x="870" y="505">TRANSACTIONS</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="830" y1="530" x2="790" y2="580"/>
+    <ellipse class="attr-oval-pk" cx="776" cy="596" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="776" y="596">id</text>
+
+    <!-- payment_id -->
+    <line class="conn" x1="870" y1="530" x2="870" y2="580"/>
+    <ellipse class="attr-oval" cx="870" cy="598" rx="44" ry="18"/>
+    <text class="attr-label" x="870" y="598">payment_id</text>
+
+    <!-- total_paid -->
+    <line class="conn" x1="910" y1="530" x2="940" y2="580"/>
+    <ellipse class="attr-oval" cx="958" cy="596" rx="40" ry="18"/>
+    <text class="attr-label" x="958" y="596">total_paid</text>
+
+    <!-- status -->
+    <line class="conn" x1="930" y1="510" x2="1010" y2="530"/>
+    <ellipse class="attr-oval" cx="1040" cy="540" rx="34" ry="18"/>
+    <text class="attr-label" x="1040" y="540">status</text>
+
+    <!-- payment_method -->
+    <line class="conn" x1="940" y1="500" x2="1020" y2="490"/>
+    <ellipse class="attr-oval" cx="1068" cy="488" rx="54" ry="18"/>
+    <text class="attr-label" x="1068" y="488">payment_method</text>
+
+    <!-- Orders —1— paid via —1— Transactions -->
+    <line class="conn" x1="865" y1="340" x2="865" y2="418"/>
+    <polygon class="rel-diamond" points="865,418 890,435 865,452 840,435"/>
+    <text class="rel-label" x="865" y="435">paid via</text>
+    <line class="conn" x1="865" y1="452" x2="865" y2="480"/>
+    <text class="card-label" x="873" y="408">1</text>
+    <text class="card-label" x="873" y="472">1</text>
+
+    <!-- From users note -->
+    <line class="conn" x1="730" y1="315" x2="800" y2="315" marker-end="url(#arrow-muted2)"/>
+    <text class="card-label" x="670" y="300">from USERS</text>
+    <text class="card-label" x="670" y="312">(Section 1)</text>
+
+    <defs>
+      <marker id="arrow-muted2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+  </svg>
+</div>
+
+<!-- ===== SECTION 3: Shipping, Wishlist ===== -->
+<div class="diagram-section">
+  <div class="section-label">Section 3 — Shipping &amp; Wishlist</div>
+  <svg viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- ===== SHIPPING entity ===== -->
+    <rect class="entity-rect" x="200" y="180" width="130" height="50" rx="3"/>
+    <text class="entity-label" x="265" y="205">SHIPPING</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="265" y1="180" x2="265" y2="110"/>
+    <ellipse class="attr-oval-pk" cx="265" cy="92" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="265" y="92">id</text>
+
+    <!-- address_1 -->
+    <line class="conn" x1="210" y1="182" x2="148" y2="120"/>
+    <ellipse class="attr-oval" cx="122" cy="104" rx="44" ry="18"/>
+    <text class="attr-label" x="122" y="104">address_1</text>
+
+    <!-- address_2 -->
+    <line class="conn" x1="200" y1="196" x2="108" y2="170"/>
+    <ellipse class="attr-oval" cx="74" cy="162" rx="44" ry="18"/>
+    <text class="attr-label" x="74" y="162">address_2</text>
+
+    <!-- city -->
+    <line class="conn" x1="200" y1="210" x2="120" y2="210"/>
+    <ellipse class="attr-oval" cx="90" cy="210" rx="28" ry="18"/>
+    <text class="attr-label" x="90" y="210">city</text>
+
+    <!-- state -->
+    <line class="conn" x1="200" y1="224" x2="120" y2="256"/>
+    <ellipse class="attr-oval" cx="90" cy="270" rx="28" ry="18"/>
+    <text class="attr-label" x="90" y="270">state</text>
+
+    <!-- zipcode -->
+    <line class="conn" x1="210" y1="228" x2="148" y2="300"/>
+    <ellipse class="attr-oval" cx="122" cy="316" rx="36" ry="18"/>
+    <text class="attr-label" x="122" y="316">zipcode</text>
+
+    <!-- country -->
+    <line class="conn" x1="230" y1="230" x2="210" y2="320"/>
+    <ellipse class="attr-oval" cx="210" cy="338" rx="36" ry="18"/>
+    <text class="attr-label" x="210" y="338">country</text>
+
+    <!-- created_at -->
+    <line class="conn" x1="265" y1="230" x2="265" y2="320"/>
+    <ellipse class="attr-oval" cx="265" cy="338" rx="44" ry="18"/>
+    <text class="attr-label" x="265" y="338">created_at</text>
+
+    <!-- Users —< saves >— Shipping -->
+    <!-- From users on left -->
+    <text class="card-label" x="44" y="208">from USERS</text>
+    <line class="conn" x1="46" y1="215" x2="140" y2="215" marker-end="url(#arrow-muted3)"/>
+
+    <!-- Shipping —< ships to >— Orders -->
+    <line class="conn" x1="330" y1="205" x2="400" y2="205"/>
+    <polygon class="rel-diamond" points="400,205 425,190 450,205 425,220"/>
+    <text class="rel-label" x="425" y="198">ships</text>
+    <text class="rel-label" x="425" y="212">to</text>
+    <line class="conn" x1="450" y1="205" x2="540" y2="205" marker-end="url(#arrow-muted3)"/>
+    <text class="card-label" x="354" y="198">1</text>
+    <text class="card-label" x="480" y="198">N</text>
+    <text class="card-label" x="550" y="208">to ORDERS (Section 2)</text>
+
+    <!-- ===== WISHLIST entity ===== -->
+    <rect class="entity-rect" x="780" y="180" width="130" height="50" rx="3"/>
+    <text class="entity-label" x="845" y="205">WISHLIST</text>
+
+    <!-- id PK -->
+    <line class="conn" x1="845" y1="180" x2="845" y2="110"/>
+    <ellipse class="attr-oval-pk" cx="845" cy="92" rx="28" ry="18"/>
+    <text class="attr-label-pk" x="845" y="92">id</text>
+
+    <!-- created_at -->
+    <line class="conn" x1="845" y1="230" x2="845" y2="310"/>
+    <ellipse class="attr-oval" cx="845" cy="328" rx="44" ry="18"/>
+    <text class="attr-label" x="845" y="328">created_at</text>
+
+    <!-- product_id FK -->
+    <line class="conn" x1="910" y1="210" x2="990" y2="160"/>
+    <ellipse class="attr-oval" cx="1022" cy="144" rx="52" ry="18"/>
+    <text class="attr-label" x="1022" y="144">product_id (FK)</text>
+
+    <!-- Users —< creates >— Wishlist -->
+    <line class="conn" x1="720" y1="205" x2="660" y2="205"/>
+    <polygon class="rel-diamond" points="660,205 635,190 610,205 635,220"/>
+    <text class="rel-label" x="635" y="205">creates</text>
+    <line class="conn" x1="610" y1="205" x2="530" y2="205" marker-end="url(#arrow-muted3)"/>
+    <text class="card-label" x="700" y="198">N</text>
+    <text class="card-label" x="524" y="198">from USERS</text>
+
+    <!-- to Products note -->
+    <line class="conn" x1="910" y1="220" x2="1000" y2="260" marker-end="url(#arrow-muted3)"/>
+    <text class="card-label" x="1010" y="263">to PRODUCTS (Section 2)</text>
+
+    <defs>
+      <marker id="arrow-muted3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+  </svg>
+</div>
+
+<footer style="border-top: 1px solid var(--border); padding-top: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); display: flex; justify-content: space-between;">
+  <span>iKicks — Database Design</span>
+  <span>Chen Notation · Underlined = Primary Key · Double border = Weak Entity</span>
+</footer>
+
+</body>
+</html>

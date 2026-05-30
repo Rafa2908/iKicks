@@ -1,15 +1,26 @@
 import "./Belownav.css";
 
+const categories = [
+  "New Arrivals",
+  "Jordan",
+  "Nike",
+  "Adidas",
+  "Yeezy",
+  "New Balance",
+  "Off-White",
+  "Asics",
+  "On Cloud",
+];
+
 const Belownav = () => {
   return (
-    <div className="below">
-      <p>New Arrivals</p>
-      <p>Jordan</p>
-      <p>Nike</p>
-      <p>Yeezy</p>
-      <p>New Balance</p>
-      <p>Off-White</p>
-    </div>
+    <nav className="belownav">
+      {categories.map((cat) => (
+        <button key={cat} className="belownav-link">
+          {cat}
+        </button>
+      ))}
+    </nav>
   );
 };
 

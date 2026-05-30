@@ -1,28 +1,84 @@
-.pic-banner {
-  margin-top: 200px;
-  padding: 40px 60px;
+.banner {
+  overflow: hidden;
+  padding: 48px 0;
 }
 
-.pic-banner img {
-  width: 500px;
-  height: 650px;
-  -o-border-radius: 15px;
-  -webkit-border-radius: 15px;
-  -moz-border-radius: 15px;
-  -ms-border-radius: 15px;
-  border-radius: 15px;
+.banner-track {
+  display: flex;
+  animation: banner-scroll 38s linear infinite;
+  will-change: transform;
+}
+
+.banner-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes banner-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.banner-card {
+  flex-shrink: 0;
+  width: 300px;
+  height: 380px;
+  margin-right: 16px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
   cursor: pointer;
-  -o-transition: 0.5s;
-  -webkit-transition: 0.5s;
-  -moz-transition: 0.5s;
-  -ms-transition: 0.5s;
-  transition: 0.5s;
+  background: #f0f0f0;
 }
 
-.pic-banner img:hover {
-  -o-transform: scale(0.9);
-  -webkit-transform: scale(0.9);
-  -moz-transform: scale(0.9);
-  -ms-transform: scale(0.9);
-  transform: scale(0.9);
+.banner-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s ease;
+}
+
+.banner-card:hover img {
+  transform: scale(1.06);
+}
+
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 55%);
+  display: flex;
+  align-items: flex-end;
+  padding: 18px 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.banner-card:hover .banner-overlay {
+  opacity: 1;
+}
+
+.banner-label {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .banner {
+    padding: 32px 0;
+  }
+
+  .banner-card {
+    width: 220px;
+    height: 280px;
+    margin-right: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-card {
+    width: 180px;
+    height: 230px;
+  }
 }

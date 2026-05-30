@@ -121,8 +121,23 @@ const NavBar = () => {
           </button>
         </div>
 
+        {/* Click-outside overlay for mobile menu */}
+        {mobileOpen && (
+          <div className="nav-mobile-overlay" onClick={() => setMobileOpen(false)} />
+        )}
+
         {/* Mobile slide-down menu */}
         <div className={`nav-mobile-menu ${mobileOpen ? "open" : ""}`}>
+          <div className="nav-mobile-header">
+            <span className="nav-mobile-title">Menu</span>
+            <button
+              className="nav-mobile-close"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
+            >
+              <i className="fa-solid fa-xmark" />
+            </button>
+          </div>
           <div className="nav-mobile-search">
             <input
               type="text"

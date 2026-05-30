@@ -1,0 +1,119 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ===== USERS ===== -->
+    <mxCell id="u" value="Users" style="shape=mxgraph.er.entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1050" y="280" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="u1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="920" y="160" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="u2" value="first_name" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1020" y="140" width="90" height="40" as="geometry"/></mxCell>
+    <mxCell id="u3" value="last_name" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1130" y="140" width="90" height="40" as="geometry"/></mxCell>
+    <mxCell id="u4" value="email" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1240" y="170" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="u5" value="password" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1260" y="270" width="90" height="40" as="geometry"/></mxCell>
+    <mxCell id="u6" value="role" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1080" y="370" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="eu1" edge="1" source="u" target="u1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eu2" edge="1" source="u" target="u2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eu3" edge="1" source="u" target="u3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eu4" edge="1" source="u" target="u4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eu5" edge="1" source="u" target="u5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eu6" edge="1" source="u" target="u6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== CART ===== -->
+    <mxCell id="c" value="Cart" style="shape=mxgraph.er.entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="620" y="280" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="c1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="540" y="160" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="ec1" edge="1" source="c" target="c1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- Users -> Cart -->
+    <mxCell id="euc" edge="1" source="u" target="c" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== CART_ITEMS relationship ===== -->
+    <mxCell id="ci" value="cart_items" style="shape=mxgraph.er.relationship;fontSize=12;" vertex="1" parent="1"><mxGeometry x="620" y="460" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="ci1" value="price_at_add" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="430" y="440" width="100" height="40" as="geometry"/></mxCell>
+    <mxCell id="ci2" value="quantity" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="430" y="510" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="ci3" value="size" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="770" y="450" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="eci1" edge="1" source="ci" target="ci1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eci2" edge="1" source="ci" target="ci2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eci3" edge="1" source="ci" target="ci3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ecci" edge="1" source="c" target="ci" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== PRODUCTS ===== -->
+    <mxCell id="p" value="Products" style="shape=mxgraph.er.entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="200" y="560" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="p1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="50" y="460" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="p2" value="name" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="50" y="530" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="p3" value="price" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="50" y="600" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="p4" value="description" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="50" y="670" width="100" height="40" as="geometry"/></mxCell>
+    <mxCell id="p5" value="image" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="180" y="680" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="ep1" edge="1" source="p" target="p1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ep2" edge="1" source="p" target="p2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ep3" edge="1" source="p" target="p3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ep4" edge="1" source="p" target="p4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ep5" edge="1" source="p" target="p5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="epci" edge="1" source="p" target="ci" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== PRODUCT_SIZE weak entity ===== -->
+    <mxCell id="ps" value="Product_size" style="shape=mxgraph.er.weak_entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="620" y="660" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="ps1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="530" y="770" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="ps2" value="size" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="630" y="780" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="ps3" value="quantity" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="730" y="770" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="eps1" edge="1" source="ps" target="ps1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eps2" edge="1" source="ps" target="ps2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eps3" edge="1" source="ps" target="ps3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="epps" edge="1" source="p" target="ps" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="epsci" edge="1" source="ps" target="ci" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== ORDERS ===== -->
+    <mxCell id="o" value="Orders" style="shape=mxgraph.er.entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1050" y="560" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="o1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="1210" y="480" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="o2" value="total_at_purchase" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1230" y="560" width="130" height="40" as="geometry"/></mxCell>
+    <mxCell id="o3" value="phone_number" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1210" y="640" width="110" height="40" as="geometry"/></mxCell>
+    <mxCell id="eo1" edge="1" source="o" target="o1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eo2" edge="1" source="o" target="o2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eo3" edge="1" source="o" target="o3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- Users -> Orders -->
+    <mxCell id="euo" edge="1" source="u" target="o" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== ORDER_ITEMS relationship ===== -->
+    <mxCell id="oi" value="order_items" style="shape=mxgraph.er.relationship;fontSize=12;" vertex="1" parent="1"><mxGeometry x="840" y="660" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="oi1" value="quantity" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="820" y="780" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="oi2" value="size" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="920" y="780" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="eoi1" edge="1" source="oi" target="oi1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eoi2" edge="1" source="oi" target="oi2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="epsoi" edge="1" source="ps" target="oi" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eooi" edge="1" source="o" target="oi" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== ADDRESSES ===== -->
+    <mxCell id="a" value="Addresses" style="shape=mxgraph.er.entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1050" y="900" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="a1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="890" y="870" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="a2" value="street" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="920" y="950" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="a3" value="city" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1040" y="1000" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="a4" value="state" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1160" y="1000" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="a5" value="zip" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1260" y="950" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="a6" value="country" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1260" y="870" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="ea1" edge="1" source="a" target="a1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ea2" edge="1" source="a" target="a2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ea3" edge="1" source="a" target="a3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ea4" edge="1" source="a" target="a4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ea5" edge="1" source="a" target="a5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ea6" edge="1" source="a" target="a6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eua" edge="1" source="u" target="a" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eoa" edge="1" source="o" target="a" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ===== TRANSACTIONS ===== -->
+    <mxCell id="t" value="Transactions" style="shape=mxgraph.er.entity;fontSize=14;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="620" y="900" width="130" height="60" as="geometry"/></mxCell>
+    <mxCell id="t1" value="id" style="shape=mxgraph.er.attribute;fontSize=12;fontStyle=4;" vertex="1" parent="1"><mxGeometry x="460" y="860" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="t2" value="payment_id" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="440" y="940" width="90" height="40" as="geometry"/></mxCell>
+    <mxCell id="t3" value="total_paid" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="530" y="1010" width="90" height="40" as="geometry"/></mxCell>
+    <mxCell id="t4" value="status" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="640" y="1010" width="80" height="40" as="geometry"/></mxCell>
+    <mxCell id="t5" value="payment_method" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="750" y="970" width="120" height="40" as="geometry"/></mxCell>
+    <mxCell id="t6" value="created_at" style="shape=mxgraph.er.attribute;fontSize=12;" vertex="1" parent="1"><mxGeometry x="770" y="890" width="90" height="40" as="geometry"/></mxCell>
+    <mxCell id="et1" edge="1" source="t" target="t1" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="et2" edge="1" source="t" target="t2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="et3" edge="1" source="t" target="t3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="et4" edge="1" source="t" target="t4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="et5" edge="1" source="t" target="t5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="et6" edge="1" source="t" target="t6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="eot" edge="1" source="o" target="t" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+  </root>
+</mxGraphModel>

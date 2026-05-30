@@ -1,65 +1,179 @@
-.sneaker-title {
-  margin-top: 250px;
+/* ── Section ──────────────────────────────────────────────── */
+.sneakers-section {
+  max-width: 1400px;
+  margin: 64px auto;
+  padding: 0 40px;
+}
+
+.sneakers-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  color: #111;
   text-align: center;
-  margin-bottom: 150px;
-  font-size: 3rem;
+  margin: 0 0 48px;
+  letter-spacing: 0.5px;
 }
 
-.sneaker-container {
+/* ── Grid ─────────────────────────────────────────────────── */
+.sneakers-grid {
   display: grid;
-  grid-template-columns: auto auto auto auto auto;
-  justify-content: space-around;
-  gap: 80px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
 }
 
+/* ── Card ─────────────────────────────────────────────────── */
 .sneaker-card {
-  width: 300px;
-  padding: 20px 15px;
-  -o-transition: 0.5s;
-  -webkit-transition: 0.5s;
-  -moz-transition: 0.5s;
-  -ms-transition: 0.5s;
-  transition: 0.5s;
-  box-shadow: 0 8px 16px 0 rgba(13, 13, 14, 0.2),
-    0 12px 40px 0 rgba(15, 15, 15, 0.19);
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.25s, transform 0.25s;
 }
 
 .sneaker-card:hover {
-  -o-transform: scale(1.1);
-  -webkit-transform: scale(1.1);
-  -moz-transform: scale(1.1);
-  -ms-transform: scale(1.1);
-  transform: scale(1.1);
-  box-shadow: 0 8px 16px 0 #4197e79a, 0 12px 40px 0 #4197e79a;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
 }
 
-.sneaker-card-body img {
+/* ── Image ────────────────────────────────────────────────── */
+.sneaker-img-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #f7f7f7;
+  overflow: hidden;
+}
+
+.sneaker-img-wrap img {
   width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+  display: block;
+  transition: transform 0.35s ease;
 }
 
-.reviews {
+.sneaker-card:hover .sneaker-img-wrap img {
+  transform: scale(1.06);
+}
+
+.sneaker-img-overlay {
+  position: absolute;
+  inset: 0;
   display: flex;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 10px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.sneaker-card:hover .sneaker-img-overlay {
+  opacity: 1;
+}
+
+.sneaker-wishlist {
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  color: #888;
+  font-size: 0.88rem;
+  transition: background 0.2s, color 0.2s;
 }
 
-.fa-star {
-  color: #116fc7;
-  margin: 15px 0;
+.sneaker-wishlist:hover {
+  background: #e53e3e;
+  color: #fff;
 }
 
-.sneaker-link {
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.699);
+/* ── Info ─────────────────────────────────────────────────── */
+.sneaker-info {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
-.nav-button button {
-  flex: 3;
-}
-
-.nav-button i {
-  font-size: 1.7rem;
+.sneaker-brand {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-primary);
   margin: 0;
-  padding: 0;
+}
+
+.sneaker-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sneaker-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.sneaker-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.sneaker-stars .fa-star {
+  color: #f5a623;
+  font-size: 0.72rem;
+}
+
+.sneaker-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .sneakers-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sneakers-section {
+    padding: 0 20px;
+    margin: 48px auto;
+  }
+
+  .sneakers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .sneakers-title {
+    font-size: 1.9rem;
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 420px) {
+  .sneakers-grid {
+    grid-template-columns: 1fr;
+  }
 }

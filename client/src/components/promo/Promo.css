@@ -1,14 +1,43 @@
 .promo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 15px 0;
-  background-color: #116fc7;
+  background: var(--color-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 9px 0;
 }
 
-.promo p {
-  font-size: 1.1rem;
+.promo-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  animation: promo-scroll 28s linear infinite;
+  will-change: transform;
+}
+
+.promo-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes promo-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.promo-item {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
   font-weight: 500;
-  color: white;
+  color: #fff;
+  letter-spacing: 0.2px;
+  padding: 0 24px;
+}
+
+.promo-item strong {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.promo-sep {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
 }

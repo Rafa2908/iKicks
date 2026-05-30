@@ -1,117 +1,63 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Sneaker.css";
-import {
-  addSneakerToWishlist,
-  getAllSneakers,
-} from "../../service/client.service";
 import { Link } from "react-router-dom";
-import { CartContext } from "../../context/CartContext";
+import { getProductsPreview } from "../../service/product.service";
 
 const Sneaker = () => {
-  const [sneakers, setSneakers] = useState([]);
-  const [wishlistOn, setWishlistOn] = useState({});
-
-  const cartContext = useContext(CartContext);
-  const { addToCart, setAlertColor, setButtonColor, setMessage, token } =
-    cartContext;
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchSneakers = async () => {
-      try {
-        const allSneakers = await getAllSneakers();
-        const shuffledSneakers = allSneakers.sort(() => Math.random() - 0.5);
-        const randomSneakers = shuffledSneakers.slice(0, 10);
-        setSneakers(randomSneakers);
-      } catch (error) {
-        console.log(error);
-      }
+    const fetchProducts = async () => {
+      const res = await getProductsPreview();
+      if (res) setProducts(res);
     };
-
-    fetchSneakers();
+    fetchProducts();
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  useEffect(() => {
-    if (wishlistOn) {
-      Object.keys(wishlistOn).forEach((key) => {
-        if (wishlistOn[key]) {
-          setMessage("Added to Wishlist");
-          setAlertColor("alert-success");
-          setButtonColor("success");
-        } else {
-          setMessage("Removed from Wishlist");
-          setAlertColor("alert-danger");
-          setButtonColor("danger");
-        }
-      });
-    }
-  }, [wishlistOn]);
-
-  const wishlistHandler = async (sneakerId) => {
-    setWishlistOn((prev) => ({
-      ...prev,
-      [sneakerId]: !prev[sneakerId],
-    }));
-    await addSneakerToWishlist(token, sneakerId).then((res) =>
-      console.log(res)
-    );
-  };
-
   return (
-    <>
-      <h2 className="sneaker-title">Feature Products</h2>
-      <div className="sneaker-container">
-        {sneakers.map((sneaker) => (
-          <div key={sneaker._id} className="sneaker-card card">
-            <div className="sneaker-card-body card-body">
-              <Link
-                to={`/sneaker/${sneaker._id}`}
-                className="sneaker-link"
-                onClick={scrollToTop}
-              >
-                <img
-                  src={sneaker.image?.image1}
-                  alt={sneaker.name}
-                  className="card-image mb-3"
-                />
-                <h4 className="text-center mb-4">{sneaker.name}</h4>
-              </Link>
-              <div className="reviews">
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
+    <section className="sneakers-section">
+      <h2 className="sneakers-title">Featured Products</h2>
+      <div className="sneakers-grid">
+        {products.map((product) => (
+          <Link
+            key={product.id}
+            to={`/products/${product.id}`}
+            className="sneaker-card"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            <div className="sneaker-img-wrap">
+              <img src={product.url} alt={product.name} />
+              <div className="sneaker-img-overlay">
+                <button
+                  className="sneaker-wishlist"
+                  aria-label="Add to wishlist"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <i className="fa-regular fa-heart" />
+                </button>
               </div>
-              <b>${sneaker.price}.00</b>
             </div>
-            <div className="d-flex justify-content-center align-items-center nav-button gap-3">
-              <button
-                className="btn btn-outline-primary"
-                onClick={() => addToCart(sneaker)}
-              >
-                Add to Cart
-              </button>
-
-              <i
-                className={`fa-heart btn ${
-                  wishlistOn[sneaker._id]
-                    ? "fa-solid text-danger"
-                    : "fa-regular text-primary"
-                }`}
-                onClick={() => wishlistHandler(sneaker._id)}
-              ></i>
+            <div className="sneaker-info">
+              {product.brand && (
+                <p className="sneaker-brand">{product.brand}</p>
+              )}
+              <p className="sneaker-name">{product.name}</p>
+              <div className="sneaker-bottom">
+                <div className="sneaker-stars">
+                  {[...Array(5)].map((_, i) => (
+                    <i key={i} className="fa-solid fa-star" />
+                  ))}
+                </div>
+                <p className="sneaker-price">${product.price}</p>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
-    </>
+    </section>
   );
 };
 

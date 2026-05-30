@@ -3,9 +3,20 @@ import "./Promo.css";
 const Promo = () => {
   return (
     <div className="promo">
-      <p>Order over $100 qualify for Free Shipping</p>
-      <p>Promotion: 10% off entire order</p>
-      <p>Promo Code: KD2024</p>
+      <div className="promo-track">
+        <span className="promo-item">Free shipping on orders over $100</span>
+        <span className="promo-sep" aria-hidden="true">·</span>
+        <span className="promo-item">10% off your entire order — Code: <strong>KD2024</strong></span>
+        <span className="promo-sep" aria-hidden="true">·</span>
+        <span className="promo-item">24/7 Customer Support</span>
+        <span className="promo-sep" aria-hidden="true">·</span>
+        <span className="promo-item">Free shipping on orders over $100</span>
+        <span className="promo-sep" aria-hidden="true">·</span>
+        <span className="promo-item">10% off your entire order — Code: <strong>KD2024</strong></span>
+        <span className="promo-sep" aria-hidden="true">·</span>
+        <span className="promo-item">24/7 Customer Support</span>
+        <span className="promo-sep" aria-hidden="true">·</span>
+      </div>
     </div>
   );
 };
