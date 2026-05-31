@@ -1,0 +1,183 @@
+/* ── Hero ─────────────────────────────────────────────────── */
+.sg-hero {
+  background: #111;
+  padding: 96px 40px;
+  text-align: center;
+}
+
+.sg-hero-title {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.sg-hero-sub {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 16px 0 0;
+}
+
+/* ── Content ──────────────────────────────────────────────── */
+.sg-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 64px 40px 88px;
+}
+
+.sg-section-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: #111;
+  margin: 0 0 20px;
+  letter-spacing: 0.4px;
+}
+
+/* ── Tip banner ───────────────────────────────────────────── */
+.sg-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f0f6ff;
+  border: 1px solid #c8dff9;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 48px;
+}
+
+.sg-tip .fa-circle-info {
+  color: var(--color-primary);
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sg-tip p {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── How to measure ───────────────────────────────────────── */
+.sg-how {
+  margin-bottom: 48px;
+}
+
+.sg-steps {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.8;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.sg-steps li {
+  margin-bottom: 6px;
+}
+
+/* ── Tables ───────────────────────────────────────────────── */
+.sg-tables {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.sg-table-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.sg-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #ebebeb;
+}
+
+.sg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+}
+
+.sg-table thead {
+  background: #111;
+  color: #fff;
+}
+
+.sg-table thead th {
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.sg-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+}
+
+.sg-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.sg-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.sg-table tbody td {
+  padding: 11px 16px;
+  font-size: 0.88rem;
+  color: #333;
+  text-align: center;
+}
+
+/* ── Note ─────────────────────────────────────────────────── */
+.sg-note {
+  margin-top: 48px;
+  padding: 20px 24px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.sg-note p {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.65;
+}
+
+.sg-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sg-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sg-hero-title {
+    font-size: 3rem;
+  }
+
+  .sg-content {
+    padding: 48px 20px 64px;
+  }
+
+  .sg-tables {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}

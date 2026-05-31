@@ -1,0 +1,688 @@
+/* ── Layout ─────────────────────────────────────────── */
+.ap-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f4f5;
+}
+
+/* ── Sidebar ────────────────────────────────────────── */
+.ap-sidebar {
+  width: 216px;
+  min-height: 100vh;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 50;
+}
+
+.ap-logo {
+  padding: 26px 20px 22px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ap-logo-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.ap-logo-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.ap-nav {
+  flex: 1;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ap-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 0.855rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ap-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+}
+
+.ap-nav-item-active {
+  background: rgba(255, 255, 255, 0.11);
+  color: #fff;
+}
+
+.ap-nav-icon {
+  width: 15px;
+  text-align: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.ap-sidebar-footer {
+  padding: 14px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ap-user-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.ap-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 1px solid #333;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.ap-user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ap-user-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ap-user-role {
+  font-size: 0.68rem;
+  color: #555;
+}
+
+.ap-logout-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.ap-logout-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Main content ───────────────────────────────────── */
+.ap-main {
+  flex: 1;
+  margin-left: 216px;
+  padding: 36px 40px;
+  min-height: 100vh;
+}
+
+/* ── Topbar ─────────────────────────────────────────── */
+.ap-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ap-page-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 3px;
+}
+
+.ap-page-sub {
+  font-size: 0.82rem;
+  color: #999;
+  margin: 0;
+}
+
+.ap-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ap-search-wrap {
+  position: relative;
+}
+
+.ap-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #bbb;
+  font-size: 0.76rem;
+  pointer-events: none;
+}
+
+.ap-search {
+  padding: 9px 14px 9px 32px;
+  border: 1.5px solid #e4e4e7;
+  border-radius: 8px;
+  font-size: 0.855rem;
+  background: #fff;
+  outline: none;
+  width: 240px;
+  font-family: inherit;
+  color: #111;
+  transition: border-color 0.15s;
+}
+
+.ap-search:focus {
+  border-color: #111;
+}
+
+.ap-add-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.ap-add-btn:hover {
+  background: #333;
+}
+
+/* ── Table ──────────────────────────────────────────── */
+.ap-table-wrap {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #ebebeb;
+  overflow-x: auto;
+}
+
+.ap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ap-table thead tr {
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.ap-table th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b0b0b0;
+  white-space: nowrap;
+}
+
+.ap-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f8f8f8;
+  vertical-align: middle;
+}
+
+.ap-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ap-table tbody tr:hover td {
+  background: #fafafa;
+}
+
+/* Product cell */
+.ap-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ap-product-thumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f0f0f0;
+  flex-shrink: 0;
+  border: 1px solid #f0f0f0;
+}
+
+.ap-product-name {
+  font-size: 0.855rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ap-product-brand {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin: 0;
+}
+
+.ap-category-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f2f2f2;
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ap-price {
+  font-weight: 600;
+  color: #111;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+/* ── Sizes cell ─────────────────────────────────────── */
+.ap-sizes-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ap-size-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f5f5f5;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 4px 5px 4px 8px;
+}
+
+.ap-size-num {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.ap-size-qty {
+  background: #e8e8e8;
+  color: #222;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  min-width: 20px;
+  text-align: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.ap-size-qty:hover {
+  background: #111;
+  color: #fff;
+}
+
+.ap-size-qty-input {
+  width: 40px;
+  padding: 2px 4px;
+  border: 1.5px solid #111;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  background: #fff;
+}
+
+.ap-size-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  padding: 0 2px;
+  font-size: 0.62rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: color 0.12s;
+}
+
+.ap-size-remove:hover {
+  color: #e53e3e;
+}
+
+.ap-size-add-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px dashed #d4d4d4;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.ap-size-add-btn:hover {
+  border-color: #111;
+  color: #111;
+}
+
+/* Add-size inline form */
+.ap-add-size-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ap-add-size-input {
+  width: 54px;
+  padding: 4px 6px;
+  border: 1.5px solid #e4e4e7;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  background: #fff;
+  transition: border-color 0.12s;
+}
+
+.ap-add-size-input:focus {
+  border-color: #111;
+}
+
+.ap-add-size-qty {
+  width: 44px;
+}
+
+.ap-add-size-confirm,
+.ap-add-size-dismiss {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  flex-shrink: 0;
+}
+
+.ap-add-size-confirm {
+  background: #111;
+  color: #fff;
+}
+
+.ap-add-size-confirm:hover {
+  background: #333;
+}
+
+.ap-add-size-dismiss {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.ap-add-size-dismiss:hover {
+  background: #e0e0e0;
+}
+
+/* Edit button */
+.ap-edit-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid #e4e4e7;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.ap-edit-btn:hover {
+  border-color: #111;
+  color: #fff;
+  background: #111;
+}
+
+/* Empty state */
+.ap-empty {
+  padding: 64px 40px;
+  text-align: center;
+  color: #ccc;
+}
+
+.ap-empty-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+  display: block;
+  color: #e0e0e0;
+}
+
+.ap-empty p {
+  font-size: 0.875rem;
+  color: #aaa;
+  margin: 0;
+}
+
+/* ── Placeholder views ──────────────────────────────── */
+.ap-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 58vh;
+  gap: 14px;
+  text-align: center;
+}
+
+.ap-placeholder-icon {
+  font-size: 2.8rem;
+  color: #ddd;
+}
+
+.ap-placeholder-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #444;
+  margin: 0;
+}
+
+.ap-placeholder-desc {
+  font-size: 0.875rem;
+  color: #aaa;
+  margin: 0;
+  max-width: 340px;
+}
+
+/* ── Unauthorized ───────────────────────────────────── */
+.ap-unauthorized {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: #aaa;
+  text-align: center;
+}
+
+.ap-unauthorized-icon {
+  font-size: 2.5rem;
+  color: #ddd;
+}
+
+.ap-unauthorized p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Edit overlay ───────────────────────────────────── */
+.ap-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  z-index: 200;
+  display: flex;
+  justify-content: flex-end;
+  overflow-y: auto;
+}
+
+.ap-overlay-panel {
+  position: relative;
+  width: min(100%, 880px);
+  min-height: 100vh;
+  background: #f4f4f5;
+  animation: slideInRight 0.24s ease;
+  overflow-y: auto;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Remove outer wrapper padding inside overlay since it inherits the page bg */
+.ap-overlay-panel .pf-wrapper {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.ap-overlay-close {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 201;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #e4e4e7;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.ap-overlay-close:hover {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ap-sidebar {
+    width: 60px;
+  }
+
+  .ap-logo-text,
+  .ap-logo-badge,
+  .ap-nav-item span,
+  .ap-user-info {
+    display: none;
+  }
+
+  .ap-logo {
+    justify-content: center;
+    padding: 20px 0;
+  }
+
+  .ap-nav-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .ap-user-chip {
+    justify-content: center;
+  }
+
+  .ap-logout-btn {
+    margin: 0 auto;
+  }
+
+  .ap-main {
+    margin-left: 60px;
+    padding: 24px 16px;
+  }
+}

@@ -1,0 +1,213 @@
+/* ── Hero ─────────────────────────────────────────────────── */
+.shi-hero {
+  background: #111;
+  padding: 96px 40px;
+  text-align: center;
+}
+
+.shi-hero-title {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.shi-hero-sub {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 16px 0 0;
+}
+
+/* ── Content ──────────────────────────────────────────────── */
+.shi-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 72px 40px 88px;
+}
+
+.shi-section-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: #111;
+  margin: 0 0 28px;
+  letter-spacing: 0.5px;
+}
+
+.shi-divider {
+  border: none;
+  border-top: 1px solid #ebebeb;
+  margin: 56px 0;
+}
+
+/* ── Delivery methods ─────────────────────────────────────── */
+.shi-methods-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shi-method-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: #f9f9f9;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 24px 28px;
+}
+
+.shi-method-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.shi-method-body {
+  flex: 1;
+}
+
+.shi-method-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.shi-method-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: #111;
+  margin: 0;
+}
+
+.shi-method-price {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+  background: #ebebeb;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.shi-method-price.free {
+  background: #d4edda;
+  color: #1a7f3c;
+}
+
+.shi-method-time {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: #888;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shi-method-desc {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── FAQs ─────────────────────────────────────────────────── */
+.shi-faqs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.shi-faq {
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.shi-faq:last-child {
+  border-bottom: none;
+}
+
+.shi-faq-q {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shi-faq-q .fa-circle-question {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.shi-faq-a {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+  padding-left: 22px;
+}
+
+/* ── Note ─────────────────────────────────────────────────── */
+.shi-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f0f6ff;
+  border: 1px solid #c8dff9;
+  border-radius: 12px;
+  padding: 18px 22px;
+}
+
+.shi-note .fa-circle-info {
+  color: var(--color-primary);
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.shi-note p {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: #333;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .shi-hero-title {
+    font-size: 3rem;
+  }
+
+  .shi-content {
+    padding: 48px 20px 64px;
+  }
+
+  .shi-method-card {
+    padding: 20px;
+  }
+
+  .shi-method-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

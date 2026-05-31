@@ -1,12 +1,19 @@
-import { createSneaker } from "../../../service/client.service";
+import { addNewProduct } from "../../../service/product.service";
 import ProductForm from "./ProductForm";
 
-const CreateForm = () => {
-  const blankForm = "";
-
-  return (
-    <ProductForm submitFunction={createSneaker} initialState={blankForm} />
-  );
+const initialState = {
+  name: "",
+  brand: "",
+  colorway: "",
+  category: "",
+  description: "",
+  price: "",
+  images: [null, null, null, null],
+  sizes: {},
 };
+
+const CreateForm = () => (
+  <ProductForm submitFunction={addNewProduct} initialState={initialState} />
+);
 
 export default CreateForm;

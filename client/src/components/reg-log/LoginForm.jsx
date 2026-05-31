@@ -50,10 +50,14 @@ const LoginForm = () => {
     setIsSubmitting(true);
     try {
       const res = await loginUser(formData);
-      if (res) {
+      if (res?.role !== "admin") {
         setUser(res);
         setMessage("Welcome back!");
         navigate("/");
+      } else {
+        setUser(res);
+        setMessage("Welcome admin");
+        navigate("/admin");
       }
     } catch (error) {
       console.error(error);
@@ -68,7 +72,11 @@ const LoginForm = () => {
   return (
     <div className="reg-overlay">
       <div className="reg-card">
-        <button className="reg-close" onClick={() => navigate(-1)} aria-label="Close">
+        <button
+          className="reg-close"
+          onClick={() => navigate(-1)}
+          aria-label="Close"
+        >
           ×
         </button>
 

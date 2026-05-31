@@ -83,6 +83,16 @@
   color: #fff;
 }
 
+.footer-links-col a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links-col a:hover {
+  color: #fff;
+}
+
 /* ── Bottom bar ───────────────────────────────── */
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.07);

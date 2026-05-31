@@ -1,20 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./AllProducts.css";
-import { getAllSneakers } from "../../service/client.service";
-import { CartContext } from "../../context/CartContext";
 import { Link } from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
+import { useContext } from "react";
 
 const AllProducts = () => {
-  const [allSneakers, setAllSneakers] = useState([]);
+  const [allSneakers] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [sneakersPerPage, setSneakersPerPage] = useState(12);
+  const [sneakersPerPage] = useState(12);
 
   const indexOfLastSneaker = currentPage * sneakersPerPage;
   const indexOfFirstSneaker = indexOfLastSneaker - sneakersPerPage;
   const currentSneakers = allSneakers.slice(
     indexOfFirstSneaker,
-    indexOfLastSneaker
+    indexOfLastSneaker,
   );
 
   const pageNumber = [];
@@ -25,10 +25,9 @@ const AllProducts = () => {
     pageNumber.push(i);
   }
 
-  const cartContext = useContext(CartContext);
-
+  const userContext = useContext(UserContext);
   const { addToCart, message, alertColor, buttonColor, setMessage } =
-    cartContext;
+    userContext;
 
   const removeAlert = () => {
     setMessage("");
@@ -36,18 +35,12 @@ const AllProducts = () => {
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
-    scrollToTop();
+    // scrollToTop();
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage]);
-
-  useEffect(() => {
-    getAllSneakers()
-      .then((res) => setAllSneakers(res))
-      .catch((error) => console.log(error));
-  }, []);
 
   return (
     <>

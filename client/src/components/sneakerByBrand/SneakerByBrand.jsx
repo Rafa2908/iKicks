@@ -1,142 +1,177 @@
-import { useContext, useState } from "react";
-import { CartContext } from "../../context/CartContext";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import notFound from "../../assets/icons/item-not-found.png";
 import "./SneakerByBrand.css";
+import { filterProducts } from "../../service/product.service";
+
+const ITEMS_PER_PAGE = 12;
 
 const SneakerByBrand = () => {
-  const cartContext = useContext(CartContext);
-  const {
-    sneakersByBrand,
-    addToCart,
-    message,
-    alertColor,
-    buttonColor,
-    setMessage,
-  } = cartContext;
-
+  const { input } = useParams();
+  const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sneakersPerPage, setSneakersPerPage] = useState(12); // Corrected state name
-  const totalSneakers = sneakersByBrand.length;
+  const [loading, setLoading] = useState(true);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [appliedMin, setAppliedMin] = useState("");
+  const [appliedMax, setAppliedMax] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const indexOfLastSneaker = currentPage * sneakersPerPage;
-  const indexOfFirstSneaker = indexOfLastSneaker - sneakersPerPage;
-  const currentSneakers = sneakersByBrand.slice(
-    indexOfFirstSneaker,
-    indexOfLastSneaker
-  );
-  const pageNumber = [];
+  useEffect(() => {
+    setLoading(true);
+    setCurrentPage(1);
+    const fetchProducts = async () => {
+      const params = { search: input };
+      if (appliedMin && appliedMax) {
+        params.minPrice = appliedMin;
+        params.maxPrice = appliedMax;
+      }
+      const res = await filterProducts(params);
+      setProducts(res ?? []);
+      setLoading(false);
+    };
+    fetchProducts();
+  }, [input, appliedMin, appliedMax]);
 
-  for (let i = 1; i <= Math.ceil(totalSneakers / sneakersPerPage); i++) {
-    pageNumber.push(i);
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentSneakers = products.slice(start, start + ITEMS_PER_PAGE);
+
+  const paginate = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (loading) {
+    return (
+      <div className="sbb-loading">
+        <div className="sbb-spinner" />
+      </div>
+    );
   }
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    scrollToTop();
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  const removeAlert = () => {
-    setMessage("");
-  };
-
   return (
-    <>
-      {message && (
-        <div
-          className={`alert ${alertColor} alert-dismissible fade show sticky-top`}
-          role="alert"
-        >
-          {message}
-          <button
-            type="button"
-            className={`btn btn-sm `}
-            onClick={() => removeAlert(message)}
-          >
-            <i
-              className={`fa-solid fa-circle-xmark icon-link-hover link-${buttonColor}`}
-            ></i>
-          </button>
-        </div>
-      )}
-      {currentSneakers.length > 0 ? (
-        <div>
-          <div className="sneaker-container-products">
-            {currentSneakers.map((sneaker) => {
-              return (
-                <div key={sneaker._id} className="sneaker-card card">
-                  <div className="sneaker-card-body card-body">
-                    <Link
-                      to={`/sneaker/${sneaker._id}`}
-                      className="sneaker-link"
-                      onClick={scrollToTop}
-                    >
-                      <img
-                        src={sneaker.image?.image1}
-                        alt=""
-                        className="card-image mb-3"
-                      />
-                      <h4 className="text-center mb-4">{sneaker.name}</h4>
-                    </Link>
-                    <div className="reviews">
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
+    <section className="sbb-section">
+      <h2 className="sbb-title">{input}</h2>
+
+      {/* Mobile filter toggle */}
+      <button
+        className="sbb-filter-toggle"
+        onClick={() => setSidebarOpen((o) => !o)}
+      >
+        <i className="fa-solid fa-sliders" />
+        {sidebarOpen ? "Hide Filters" : "Filters"}
+      </button>
+
+      <div className="sbb-layout">
+        {/* ── Sidebar ─────────────────────────────────────── */}
+        <aside className={`sbb-sidebar ${sidebarOpen ? "open" : ""}`}>
+          <div className="sbb-sidebar-header">
+            <h3 className="sbb-sidebar-title">Filters</h3>
+          </div>
+
+          <div className="sbb-filter-group">
+            <p className="sbb-filter-label">Price Range</p>
+            <div className="sbb-price-row">
+              <div className="sbb-price-field">
+                <span className="sbb-price-prefix">$</span>
+                <input
+                  type="number"
+                  className="sbb-price-input"
+                  placeholder="Min"
+                  min={0}
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
+              </div>
+              <span className="sbb-price-sep">—</span>
+              <div className="sbb-price-field">
+                <span className="sbb-price-prefix">$</span>
+                <input
+                  type="number"
+                  className="sbb-price-input"
+                  placeholder="Max"
+                  min={0}
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
+              </div>
+            </div>
+            <button
+              className="sbb-apply-btn"
+              onClick={() => { setAppliedMin(minPrice); setAppliedMax(maxPrice); }}
+            >
+              Apply
+            </button>
+            <button
+              className="sbb-reset-btn"
+              onClick={() => { setMinPrice(""); setMaxPrice(""); setAppliedMin(""); setAppliedMax(""); }}
+            >
+              Reset
+            </button>
+          </div>
+        </aside>
+
+        {/* ── Product area ─────────────────────────────── */}
+        <div className="sbb-content">
+          {currentSneakers.length > 0 ? (
+            <>
+              <div className="sbb-grid">
+                {currentSneakers.map((product) => (
+                  <Link
+                    key={product.id}
+                    to={`/products/${product.id}`}
+                    className="sbb-card"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  >
+                    <div className="sbb-img-wrap">
+                      <img src={product.url} alt={product.name} />
                     </div>
-                    <b>${sneaker.price}.00</b>
-                  </div>
-                  <button
-                    className="btn btn-outline-primary"
-                    onClick={() => addToCart(sneaker)}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-          <nav className="container d-flex justify-content-center mt-4">
-            <ul className="pagination">
-              {pageNumber.map((number) => (
-                <li
-                  key={number}
-                  className={`page-item ${
-                    currentPage === number ? "active" : ""
-                  }`}
-                >
-                  <button
-                    onClick={() => paginate(number)}
-                    className="page-link"
-                  >
-                    {number}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+                    <div className="sbb-info">
+                      {product.brand && (
+                        <p className="sbb-brand">{product.brand}</p>
+                      )}
+                      <p className="sbb-name">{product.name}</p>
+                      <div className="sbb-bottom">
+                        <div className="sbb-stars">
+                          {[...Array(5)].map((_, i) => (
+                            <i key={i} className="fa-solid fa-star" />
+                          ))}
+                        </div>
+                        <p className="sbb-price">${product.price}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <nav className="sbb-pagination">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button
+                      key={i}
+                      className={`sbb-page-btn ${currentPage === i + 1 ? "active" : ""}`}
+                      onClick={() => paginate(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </nav>
+              )}
+            </>
+          ) : (
+            <div className="sbb-empty">
+              <img src={notFound} alt="Not found" className="sbb-not-found" />
+              <h3 className="sbb-empty-title">No sneakers found</h3>
+              <p className="sbb-empty-sub">No results for &ldquo;{input}&rdquo;</p>
+              <Link className="sbb-back-btn" to="/">
+                Go Back Home
+              </Link>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="container mt-5 mb-5 text-center">
-          <h1 className="display-1 mb-5">Item not found</h1>
-          <p className="display-5 mb-4">Please try again</p>
-          <img src={notFound} className="not-found" />
-          <div className="d-flex align-items-center justify-content-center mt-3">
-            <Link className="btn btn-outline-warning" to={"/"}>
-              Go Back Home
-            </Link>
-          </div>
-        </div>
-      )}
-    </>
+      </div>
+    </section>
   );
 };
 

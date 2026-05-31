@@ -170,6 +170,32 @@ export const getProductsPreview = async (req, res) => {
   }
 };
 
+export const getProductInfo = async (req, res) => {
+  try {
+    const products = await pool.query(`
+            SELECT p.id, p.name, p.price, p.brand, p.category, pi.url,
+            ARRAY_AGG(JSON_BUILD_OBJECT('size', size, 'quantity', quantity)) as sizes
+            FROM products p 
+            JOIN product_image pi
+            ON p.id=pi.product_id
+            JOIN product_size ps
+            ON pi.product_id=ps.product_id
+            WHERE pi.is_primary=true
+            GROUP BY p.id, p.name, p.price, p.brand, p.category, pi.url
+            `);
+
+    if (products.rowCount === 0) {
+      return res.status(404).json({ message: "No products available" });
+    }
+
+    return res.status(200).json(products.rows);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getProductDetails = async (req, res) => {
   const { productId } = req.params;
   try {
@@ -197,7 +223,7 @@ export const getProductDetails = async (req, res) => {
       ) i ON p.id=i.product_id
       LEFT JOIN(
         SELECT product_id,
-        JSON_OBJECT_AGG(size, JSON_BUILD_OBJECT('quantity', quantity)) as sizes
+        ARRAY_AGG(JSON_BUILD_OBJECT('size', size, 'quantity', quantity)) as sizes
         FROM product_size
         GROUP BY product_id
       ) s ON p.id=s.product_id
@@ -261,7 +287,7 @@ export const updateQuantityBySize = async (req, res) => {
 };
 
 export const updatePriceById = async (req, res) => {
-  const { productId , price } = req.body;
+  const { productId, price } = req.body;
 
   try {
     //Checks if price data is provided || Passed ✅
@@ -305,26 +331,32 @@ export const updatePriceById = async (req, res) => {
 };
 
 export const filterProducts = async (req, res) => {
-  const {name, brand, minPrice, maxPrice} = req.query;
+  const { name, brand, minPrice, maxPrice, search } = req.query;
 
   try {
-    const conditions = ['pi.is_primary=true']
-    const params = []
+    const conditions = ["pi.is_primary=true"];
+    const params = [];
     let count = 1;
 
+    if (search) {
+      conditions.push(`(p.brand ILIKE $${count} OR p.name ILIKE $${count})`);
+      params.push(`%${search}%`);
+      count++;
+    }
+
     if (brand) {
-      conditions.push(`p.brand ILIKE $${count++}`)
-      params.push(`%${brand}%`)
+      conditions.push(`p.brand ILIKE $${count++}`);
+      params.push(`%${brand}%`);
     }
 
     if (name) {
-      conditions.push(`p.name ILIKE $${count++}`)
-      params.push(`%${name}%`)
+      conditions.push(`p.name ILIKE $${count++}`);
+      params.push(`%${name}%`);
     }
 
     if (minPrice && maxPrice) {
-      conditions.push(`p.price BETWEEN $${count++} AND $${count++}`)
-      params.push(Number(minPrice), Number(maxPrice))
+      conditions.push(`p.price BETWEEN $${count++} AND $${count++}`);
+      params.push(Number(minPrice), Number(maxPrice));
     }
 
     const query = `
@@ -332,23 +364,20 @@ export const filterProducts = async (req, res) => {
         FROM products p
         JOIN product_image pi
         ON p.id=pi.product_id
-        WHERE ${conditions.join(' AND ')}
+        WHERE ${conditions.join(" AND ")}
         ORDER BY p.price ASC
-    `
-    
+    `;
+
     const products = await pool.query(query, params);
 
     if (products.rowCount === 0) {
       return res.status(404).json({ message: "No products found" });
     }
 
-    return res.status(200).json(products.rows)
-
+    return res.status(200).json(products.rows);
   } catch (error) {
     console.error(error.message);
-    
-    return res.status(500).json({message: "Internal server error"})
+
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-

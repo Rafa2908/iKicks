@@ -1,11 +1,9 @@
-import React, { useContext } from "react";
-import { CartContext } from "../../context/CartContext";
 import { Link } from "react-router-dom";
 
 const OrderConfirmation = () => {
-  const { userInfo } = useContext(CartContext);
-
-  const { email } = userInfo;
+  // const { userInfo } = useContext(CartContext);
+  // const { email } = userInfo;
+  const email = null;
 
   return (
     <div className="container">

@@ -5,10 +5,14 @@ import Promo from "../promo/Promo";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext, useRef, useEffect } from "react";
 import { UserContext } from "../../context/UserContext";
+import { logoutUser } from "../../service/user.service";
 
 const NavBar = () => {
+  const userContext = useContext(UserContext);
+  const { setMessage } = userContext;
+
   const [inputText, setInputText] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -28,10 +32,23 @@ const NavBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const logout = () => {
-    setUser({});
-    setDropdownOpen(false);
-    navigate("/");
+  const navigateTo = (input) => {
+    navigate(`/filter/${input}`);
+  };
+
+  const logout = async () => {
+    try {
+      const res = await logoutUser();
+
+      if (res) {
+        setUser({});
+        setMessage("Logged out successfully");
+        setDropdownOpen(false);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -58,7 +75,12 @@ const NavBar = () => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
           />
-          <button type="button" className="nav-search-btn" aria-label="Search">
+          <button
+            type="button"
+            className="nav-search-btn"
+            aria-label="Search"
+            onClick={() => navigateTo(inputText)}
+          >
             <i className="fa-solid fa-magnifying-glass" />
           </button>
         </div>
@@ -123,7 +145,10 @@ const NavBar = () => {
 
         {/* Click-outside overlay for mobile menu */}
         {mobileOpen && (
-          <div className="nav-mobile-overlay" onClick={() => setMobileOpen(false)} />
+          <div
+            className="nav-mobile-overlay"
+            onClick={() => setMobileOpen(false)}
+          />
         )}
 
         {/* Mobile slide-down menu */}
@@ -165,7 +190,10 @@ const NavBar = () => {
                 </Link>
                 <button
                   className="nav-mobile-logout"
-                  onClick={() => { logout(); setMobileOpen(false); }}
+                  onClick={() => {
+                    logout();
+                    setMobileOpen(false);
+                  }}
                 >
                   <i className="fa-solid fa-right-from-bracket" /> Logout
                 </button>

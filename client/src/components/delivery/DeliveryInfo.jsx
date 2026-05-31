@@ -1,8 +1,6 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./DeliveryInfo.css";
-import { Link } from "react-router-dom";
-import { CartContext } from "../../context/CartContext";
-import { stripePayment } from "../../service/client.service";
+// import { stripePayment } from "../../service/client.service";
 
 const DeliveryInfo = () => {
   const [deliveryInfo, setDeliveryInfo] = useState({
@@ -19,11 +17,12 @@ const DeliveryInfo = () => {
   // Set deliveryCharge as a number
   const [deliveryCharge, setDeliveryCharge] = useState(4.99);
 
-  const { cartDetails } = useContext(CartContext);
+  // const { cartDetails } = useContext(CartContext);
+  const cartDetails = [];
 
   const subtotal = cartDetails.reduce(
     (total, item) => total + item.price * item.quantity,
-    0
+    0,
   );
 
   const taxRate = 0.1;
@@ -38,7 +37,7 @@ const DeliveryInfo = () => {
       if (window.google) {
         const autocomplete = new window.google.maps.places.Autocomplete(
           address1Ref.current,
-          { types: ["address"] }
+          { types: ["address"] },
         );
 
         autocomplete.addListener("place_changed", () => {
@@ -59,7 +58,7 @@ const DeliveryInfo = () => {
               }
               return acc;
             },
-            {}
+            {},
           );
 
           setDeliveryInfo((prev) => ({
@@ -105,27 +104,19 @@ const DeliveryInfo = () => {
   const placeOrder = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
+    // try {
+    //   const response = await stripePayment(orderData, token);
+    //   console.log("Stripe Payment Response:", response);
 
-    let orderData = {
-      address: deliveryInfo,
-      items: cartDetails,
-      amount: totalOrderAmount, // Include delivery charge
-    };
-
-    try {
-      const response = await stripePayment(orderData, token);
-      console.log("Stripe Payment Response:", response);
-
-      if (response.success) {
-        const { session_url } = response;
-        window.location.replace(session_url);
-      } else {
-        console.error("Payment was not successful:", response);
-      }
-    } catch (error) {
-      console.error("Error during payment:", error);
-    }
+    //   if (response.success) {
+    //     const { session_url } = response;
+    //     window.location.replace(session_url);
+    //   } else {
+    //     console.error("Payment was not successful:", response);
+    //   }
+    // } catch (error) {
+    //   console.error("Error during payment:", error);
+    // }
   };
 
   return (

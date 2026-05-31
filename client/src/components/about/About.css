@@ -1,0 +1,156 @@
+/* ── Hero ─────────────────────────────────────────────────── */
+.about-hero {
+  background: #111;
+  padding: 96px 40px;
+  text-align: center;
+}
+
+.about-hero-title {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.about-hero-sub {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 16px 0 0;
+  letter-spacing: 0.4px;
+}
+
+/* ── Content ──────────────────────────────────────────────── */
+.about-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 72px 40px 88px;
+}
+
+.about-section-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: #111;
+  margin: 0 0 24px;
+  letter-spacing: 0.5px;
+}
+
+.about-story {
+  max-width: 760px;
+}
+
+.about-text {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.8;
+  margin: 0 0 18px;
+}
+
+.about-divider {
+  border: none;
+  border-top: 1px solid #ebebeb;
+  margin: 56px 0;
+}
+
+/* ── Values ───────────────────────────────────────────────── */
+.about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.about-value-card {
+  background: #f9f9f9;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.about-value-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin: 0 auto 18px;
+}
+
+.about-value-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: #111;
+  margin: 0 0 10px;
+}
+
+.about-value-desc {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: #666;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Stats ────────────────────────────────────────────────── */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.about-stat-number {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  color: #111;
+  margin: 0;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.about-stat-label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 10px 0 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .about-hero-title {
+    font-size: 3rem;
+  }
+
+  .about-content {
+    padding: 48px 20px 64px;
+  }
+
+  .about-values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero {
+    padding: 72px 24px;
+  }
+
+  .about-hero-title {
+    font-size: 2.6rem;
+  }
+}

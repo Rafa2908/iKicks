@@ -1,19 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { userOrders } from "../../service/client.service";
+import { useState } from "react";
 import "./MyOrder.css";
 
 const MyOrders = () => {
   const token = localStorage.getItem("token");
 
-  const [myOrders, setMyOrders] = useState([]);
-
-  useEffect(() => {
-    if (token) {
-      userOrders(token)
-        .then((res) => setMyOrders(res.orders))
-        .catch((error) => console.log(error));
-    }
-  }, []);
+  const [myOrders] = useState([]);
 
   return (
     <>

@@ -1,0 +1,109 @@
+/* ── Hero ─────────────────────────────────────────────────── */
+.terms-hero {
+  background: #111;
+  padding: 96px 40px;
+  text-align: center;
+}
+
+.terms-hero-title {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.terms-hero-sub {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 14px 0 0;
+  letter-spacing: 0.3px;
+}
+
+/* ── Content ──────────────────────────────────────────────── */
+.terms-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 64px 40px 88px;
+}
+
+.terms-intro {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.8;
+  margin: 0 0 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #ebebeb;
+}
+
+/* ── Sections ─────────────────────────────────────────────── */
+.terms-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.terms-section {
+  padding: 28px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.terms-section:last-child {
+  border-bottom: none;
+}
+
+.terms-section-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: #111;
+  margin: 0 0 12px;
+  letter-spacing: 0.3px;
+}
+
+.terms-section-body {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* ── Footer note ──────────────────────────────────────────── */
+.terms-footer-note {
+  margin-top: 48px;
+  padding: 20px 24px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+}
+
+.terms-footer-note p {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.65;
+}
+
+.terms-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .terms-hero-title {
+    font-size: 3rem;
+  }
+
+  .terms-content {
+    padding: 48px 20px 64px;
+  }
+}
