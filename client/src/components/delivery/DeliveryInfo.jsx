@@ -32,64 +32,9 @@ const DeliveryInfo = () => {
 
   const address1Ref = useRef(null);
 
-  useEffect(() => {
-    const handleScriptLoad = () => {
-      if (window.google) {
-        const autocomplete = new window.google.maps.places.Autocomplete(
-          address1Ref.current,
-          { types: ["address"] },
-        );
-
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace();
-          const addressComponents = place.address_components.reduce(
-            (acc, component) => {
-              const types = component.types;
-              if (types.includes("street_number")) {
-                acc.street_number = component.long_name;
-              } else if (types.includes("route")) {
-                acc.route = component.long_name;
-              } else if (types.includes("locality")) {
-                acc.city = component.long_name;
-              } else if (types.includes("administrative_area_level_1")) {
-                acc.state = component.short_name;
-              } else if (types.includes("postal_code")) {
-                acc.zip_code = component.long_name;
-              }
-              return acc;
-            },
-            {},
-          );
-
-          setDeliveryInfo((prev) => ({
-            ...prev,
-            address1: `${addressComponents.street_number || ""} ${
-              addressComponents.route || ""
-            }`.trim(),
-            city: addressComponents.city || "",
-            state: addressComponents.state || "",
-            zip_code: addressComponents.zip_code || "",
-          }));
-        });
-      }
-    };
-
-    if (!window.google) {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.addEventListener("load", handleScriptLoad);
-      document.body.appendChild(script);
-
-      return () => {
-        script.removeEventListener("load", handleScriptLoad);
-        document.body.removeChild(script);
-      };
-    } else {
-      handleScriptLoad();
-    }
-  }, []);
+  // Google Maps autocomplete disabled — re-enable when ready by uncommenting this block
+  // and the script tag in index.html. Key is in VITE_GOOGLE_MAPS_API_KEY (.env).
+  useEffect(() => {}, []);
 
   const updateDeliveryInfo = (e) => {
     const { name, value } = e.target;
