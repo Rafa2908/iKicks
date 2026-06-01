@@ -6,6 +6,7 @@ import {
   getProductInfo,
   getProductsPreview,
   updatePriceById,
+  updateProductById,
   updateQuantityBySize,
 } from "../controllers/product.controllers.js";
 import authMiddleware from "../middleware/auth.js";
@@ -30,6 +31,9 @@ productRouter
 productRouter
   .route("/update/price")
   .put(authMiddleware, authManager, updateDataLimiter, updatePriceById);
+productRouter
+  .route("/update/item")
+  .put(authMiddleware, authManager, updateDataLimiter, updateProductById);
 productRouter.route("/filter").get(getDataLimiter, filterProducts);
 
 export default productRouter;

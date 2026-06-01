@@ -17,6 +17,7 @@ const BRANDS = [
   "Vans",
   "Asics",
   "Saucony",
+  "On",
 ];
 const CATEGORIES = [
   "Basketball",
@@ -31,7 +32,9 @@ const CATEGORIES = [
 const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
   const [formData, setFormData] = useState(initialState);
   const [previews, setPreviews] = useState(
-    initialState.images.map((img) => (typeof img === "string" && img ? img : null)),
+    initialState.images.map((img) =>
+      typeof img === "string" && img ? img : null,
+    ),
   );
   const [errors, setErrors] = useState({});
   const previewsRef = useRef(previews);
@@ -117,6 +120,14 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
     return errs;
   };
 
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
@@ -125,6 +136,12 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
       return;
     }
 
+    const images = await Promise.all(
+      formData.images
+        .filter(Boolean)
+        .map((img) => (img instanceof File ? fileToBase64(img) : img)),
+    );
+
     const payload = {
       name: formData.name,
       brand: formData.brand,
@@ -132,7 +149,7 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
       category: formData.category,
       description: formData.description,
       price: Number(formData.price),
-      images: formData.images.filter(Boolean),
+      images,
       sizes: Object.entries(formData.sizes).map(([size, quantity]) => ({
         size: Number(size),
         quantity,
@@ -371,7 +388,11 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
           {/* ── Actions ────────────────────────────────────── */}
           <div className="pf-actions">
             {onCancel ? (
-              <button type="button" className="pf-btn-cancel" onClick={onCancel}>
+              <button
+                type="button"
+                className="pf-btn-cancel"
+                onClick={onCancel}
+              >
                 Cancel
               </button>
             ) : (

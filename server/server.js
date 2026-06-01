@@ -23,7 +23,7 @@ const app = express();
 app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 app.use(helmet());
-app.use(express.json(), express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "20mb" }), express.urlencoded({ extended: true, limit: "20mb" }));
 app.use(cookieParser());
 app.use(
   cors({

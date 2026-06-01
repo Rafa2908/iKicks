@@ -2,7 +2,12 @@ import { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import "./AdminPage.css";
-import { getProductInfo, getProductDetails } from "../../../service/product.service";
+import {
+  getProductInfo,
+  getProductDetails,
+  updateQuantityBySize,
+  updatePriceById,
+} from "../../../service/product.service";
 import { logoutUser } from "../../../service/user.service";
 import { UserContext } from "../../../context/UserContext";
 import ProductForm from "../product-form/ProductForm";
@@ -38,6 +43,7 @@ const AdminPage = () => {
   const [search, setSearch] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
   const [sizeEdits, setSizeEdits] = useState({});
+  const [priceEdits, setPriceEdits] = useState({});
   const [addingSizeFor, setAddingSizeFor] = useState(null);
   const [newSize, setNewSize] = useState({ size: "", quantity: 1 });
 
@@ -59,14 +65,15 @@ const AdminPage = () => {
       p.brand.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const startSizeEdit = (productId, size, currentQty) => {
-    setSizeEdits((prev) => ({ ...prev, [`${productId}-${size}`]: currentQty }));
+  const startSizeEdit = async (productId, size, quantity) => {
+    setSizeEdits((prev) => ({ ...prev, [`${productId}-${size}`]: quantity }));
   };
 
-  const saveSizeQty = (productId, size) => {
+  const saveSizeQty = async (productId, size) => {
     const key = `${productId}-${size}`;
     const qty = sizeEdits[key];
-    // TODO: call updateQuantityBySize({ productId, size, quantity: qty })
+    await updateQuantityBySize({ productId, size, quantity: qty });
+
     setProducts((prev) =>
       prev.map((p) =>
         p.id === productId
@@ -118,6 +125,31 @@ const AdminPage = () => {
     );
     setAddingSizeFor(null);
     setNewSize({ size: "", quantity: 1 });
+  };
+
+  const startPriceEdit = (productId, currentPrice) => {
+    setPriceEdits((prev) => ({ ...prev, [productId]: currentPrice }));
+  };
+
+  const savePrice = async (productId) => {
+    const price = Number(priceEdits[productId]);
+    if (!price || price <= 0) {
+      setPriceEdits((prev) => {
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      });
+      return;
+    }
+    await updatePriceById({ productId, price });
+    setProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, price } : p)),
+    );
+    setPriceEdits((prev) => {
+      const next = { ...prev };
+      delete next[productId];
+      return next;
+    });
   };
 
   const handleEdit = async (product) => {
@@ -271,9 +303,36 @@ const AdminPage = () => {
                       </td>
 
                       <td>
-                        <span className="ap-price">
-                          RD${Number(product.price).toLocaleString()}
-                        </span>
+                        {product.id in priceEdits ? (
+                          <input
+                            className="ap-price-input"
+                            type="number"
+                            min="1"
+                            step="0.01"
+                            autoFocus
+                            value={priceEdits[product.id]}
+                            onChange={(e) =>
+                              setPriceEdits((prev) => ({
+                                ...prev,
+                                [product.id]: e.target.value,
+                              }))
+                            }
+                            onBlur={() => savePrice(product.id)}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" && savePrice(product.id)
+                            }
+                          />
+                        ) : (
+                          <button
+                            className="ap-price"
+                            onClick={() =>
+                              startPriceEdit(product.id, product.price)
+                            }
+                            title="Click to edit price"
+                          >
+                            RD${Number(product.price).toLocaleString()}
+                          </button>
+                        )}
                       </td>
 
                       <td>

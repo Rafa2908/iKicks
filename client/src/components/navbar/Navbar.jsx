@@ -9,7 +9,7 @@ import { logoutUser } from "../../service/user.service";
 
 const NavBar = () => {
   const userContext = useContext(UserContext);
-  const { setMessage } = userContext;
+  const { setMessage, user, setUser } = userContext;
 
   const [inputText, setInputText] = useState("");
   const [loading] = useState(false);
@@ -19,7 +19,6 @@ const NavBar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const { user, setUser } = useContext(UserContext);
   const isLoggedIn = user && Object.keys(user).length > 0;
 
   useEffect(() => {
@@ -106,7 +105,10 @@ const NavBar = () => {
                 </button>
 
                 <div className={`nav-dropdown ${dropdownOpen ? "open" : ""}`}>
-                  <Link to="/profile" onClick={() => setDropdownOpen(false)}>
+                  <Link
+                    to={user.role === "admin" ? "/admin" : "/profile"}
+                    onClick={() => setDropdownOpen(false)}
+                  >
                     <i className="fa-regular fa-user" /> Profile
                   </Link>
                   <Link to="/myorders" onClick={() => setDropdownOpen(false)}>

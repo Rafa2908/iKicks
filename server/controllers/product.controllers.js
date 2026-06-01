@@ -244,6 +244,119 @@ export const getProductDetails = async (req, res) => {
   }
 };
 
+export const updateProductById = async (req, res) => {
+  const {
+    id,
+    name,
+    brand,
+    colorway,
+    category,
+    description,
+    price,
+    images,
+    sizes,
+  } = req.body;
+
+  try {
+    if (
+      !id ||
+      !name ||
+      !brand ||
+      !colorway ||
+      !category ||
+      !description ||
+      !price ||
+      !images ||
+      !sizes
+    ) {
+      return res.status(400).json({ message: "No data provided" });
+    }
+
+    if (!productNameVerification(name)) {
+      return res.status(400).json({ message: "Invalid name" });
+    }
+
+    if (isNaN(Number(price))) {
+      return res.status(400).json({ message: "Price must be a number" });
+    }
+
+    if (!Array.isArray(images)) {
+      return res.status(400).json({ message: "Invalid data provided" });
+    }
+
+    if (!Array.isArray(sizes)) {
+      return res.status(400).json({ message: "Invalid data provided" });
+    }
+
+    await pool.query("BEGIN");
+
+    const updateProduct = await pool.query(
+      `
+      UPDATE products
+      SET name=$1, brand=$2, colorway=$3, category=$4, description=$5, price=$6
+      WHERE id=$7
+      `,
+      [name, brand, colorway, category, description, price, id],
+    );
+
+    await pool.query(
+      `
+      DELETE FROM product_image
+      WHERE product_id=$1
+      `,
+      [id],
+    );
+
+    for (let i = 0; i < images.length; i++) {
+      await pool.query(
+        `
+        INSERT INTO product_image(product_id, url, is_primary)
+        VALUES($1, $2, $3)
+        `,
+        [id, images[i], i === 0],
+      );
+    }
+
+    for (const item of sizes) {
+      const size = await pool.query(
+        `
+        SELECT id FROM product_size
+        WHERE product_id=$1 AND size=$2
+        `,
+        [id, item.size],
+      );
+
+      if (size.rowCount > 0) {
+        await pool.query(
+          `
+          UPDATE product_size
+          SET quantity=$1
+          WHERE product_id=$2 AND size=$3
+          `,
+          [item.quantity, id, item.size],
+        );
+      } else {
+        await pool.query(
+          `
+          INSERT INTO product_size(product_id, size, quantity)
+          VALUES($1, $2, $3)
+          `,
+          [id, item.size, item.quantity],
+        );
+      }
+    }
+
+    await pool.query("COMMIT");
+
+    return res.status(200).json({ message: "Product updated" });
+  } catch (error) {
+    console.error(error.message);
+    await pool.query("ROLLBACK");
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const updateQuantityBySize = async (req, res) => {
   const { productId, size, quantity } = req.body;
 
