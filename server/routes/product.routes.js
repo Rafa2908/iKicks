@@ -18,9 +18,7 @@ const productRouter = Router();
 productRouter
   .route("/add")
   .post(authMiddleware, authManager, updateDataLimiter, addNewProduct);
-productRouter
-  .route("/info")
-  .get(authMiddleware, authManager, getDataLimiter, getProductInfo);
+productRouter.route("/info").get(getDataLimiter, getProductInfo);
 productRouter.route("/preview").get(getDataLimiter, getProductsPreview);
 productRouter
   .route("/details/:productId")

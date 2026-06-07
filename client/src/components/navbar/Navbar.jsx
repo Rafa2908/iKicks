@@ -6,9 +6,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext, useRef, useEffect } from "react";
 import { UserContext } from "../../context/UserContext";
 import { logoutUser } from "../../service/user.service";
+import { CartContext } from "../../context/CartContext";
 
 const NavBar = () => {
   const userContext = useContext(UserContext);
+  const cartContext = useContext(CartContext);
+
+  const { cartCount, setCartCount } = cartContext;
   const { setMessage, user, setUser } = userContext;
 
   const [inputText, setInputText] = useState("");
@@ -41,6 +45,7 @@ const NavBar = () => {
 
       if (res) {
         setUser({});
+        setCartCount(0);
         setMessage("Logged out successfully");
         setDropdownOpen(false);
         navigate("/");
@@ -129,7 +134,7 @@ const NavBar = () => {
           {/* Cart — always visible */}
           <Link to="/cart" className="nav-icon-link nav-cart" title="Cart">
             <i className="fa-solid fa-cart-shopping" />
-            <span className="nav-cart-badge">0</span>
+            <span className="nav-cart-badge">{cartCount ? cartCount : 0}</span>
           </Link>
 
           {/* Hamburger — mobile only */}

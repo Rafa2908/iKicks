@@ -53,10 +53,12 @@ export const addNewProduct = async (req, res) => {
         .json({ message: "Only 4 pictures allowed per product" });
     }
 
-    //Image URL validation || Passed ✅
-    for (const image of images) {
-      if (!urlValidation(image)) {
-        return res.status(400).json({ message: `${image} is not valid` });
+    //Validate Cloudinary URLs returned from upload || Passed ✅
+    for (const imageUrl of imageUrls) {
+      if (!urlValidation(imageUrl)) {
+        return res
+          .status(400)
+          .json({ message: "Image upload returned invalid URL" });
       }
     }
 
@@ -258,6 +260,7 @@ export const updateProductById = async (req, res) => {
   } = req.body;
 
   try {
+    const imageUrls = await generateUrl(images);
     if (
       !id ||
       !name ||
@@ -307,13 +310,13 @@ export const updateProductById = async (req, res) => {
       [id],
     );
 
-    for (let i = 0; i < images.length; i++) {
+    for (let i = 0; i < imageUrls.length; i++) {
       await pool.query(
         `
         INSERT INTO product_image(product_id, url, is_primary)
         VALUES($1, $2, $3)
         `,
-        [id, images[i], i === 0],
+        [id, imageUrls[i], i === 0],
       );
     }
 

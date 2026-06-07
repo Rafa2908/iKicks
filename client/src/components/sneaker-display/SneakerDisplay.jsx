@@ -1,14 +1,20 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./SneakerDisplay.css";
 import { useParams } from "react-router-dom";
 import { getProductDetails } from "../../service/product.service";
+import { addToCart } from "../../service/cart.service";
+import { ToastContext } from "../../context/ToastContext";
+import { CartContext } from "../../context/CartContext";
 
 const SneakerDisplay = () => {
   const { productId } = useParams();
+  const { showToast } = useContext(ToastContext);
+  const { refreshCart } = useContext(CartContext);
 
   const [product, setProduct] = useState({});
   const [mainImage, setMainImage] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -24,6 +30,22 @@ const SneakerDisplay = () => {
 
   const quantityAvailable =
     product.sizes?.find((s) => String(s.size) === selectedSize)?.quantity ?? 0;
+
+  const handleAddToCart = async () => {
+    if (adding || quantityAvailable === 0) return;
+    setAdding(true);
+    const res = await addToCart({
+      productId: Number(productId),
+      size: Number(selectedSize),
+    });
+    setAdding(false);
+    if (res) {
+      showToast("Added to cart!");
+      refreshCart();
+    } else {
+      showToast("Could not add to cart", "error");
+    }
+  };
 
   return (
     <div className="sd-page">
@@ -83,7 +105,22 @@ const SneakerDisplay = () => {
           </p>
         </div>
 
-        <button className="sd-add-btn">Add to Cart</button>
+        <button
+          className={`sd-add-btn${adding ? " sd-add-btn--loading" : ""}`}
+          onClick={handleAddToCart}
+          disabled={adding || quantityAvailable === 0}
+        >
+          {adding ? (
+            <>
+              <i className="fa-solid fa-spinner sd-spinner" />
+              Adding...
+            </>
+          ) : quantityAvailable === 0 ? (
+            "Out of Stock"
+          ) : (
+            "Add to Cart"
+          )}
+        </button>
 
         <ul className="sd-disclaimers">
           <li>

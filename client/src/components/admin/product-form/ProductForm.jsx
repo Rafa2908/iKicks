@@ -37,6 +37,8 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
     ),
   );
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const previewsRef = useRef(previews);
   previewsRef.current = previews;
 
@@ -157,10 +159,13 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
     };
 
     try {
+      setLoading(true);
       await submitFunction(payload);
-      navigate("/admin");
+      setSuccess(true);
+      setTimeout(() => navigate("/admin"), 1500);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
   };
 
@@ -386,12 +391,19 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
           </div>
 
           {/* ── Actions ────────────────────────────────────── */}
+          {success && (
+            <div className="pf-success">
+              <i className="fa-solid fa-circle-check" />
+              Product added successfully!
+            </div>
+          )}
           <div className="pf-actions">
             {onCancel ? (
               <button
                 type="button"
                 className="pf-btn-cancel"
                 onClick={onCancel}
+                disabled={loading}
               >
                 Cancel
               </button>
@@ -400,9 +412,17 @@ const ProductForm = ({ submitFunction, initialState, isUpdate, onCancel }) => {
                 Cancel
               </Link>
             )}
-            <button type="submit" className="pf-btn-submit">
-              <i className={`fa-solid ${updateMode ? "fa-pen" : "fa-plus"}`} />
-              {updateMode ? "Update Product" : "Add Product"}
+            <button type="submit" className="pf-btn-submit" disabled={loading}>
+              {loading ? (
+                <i className="fa-solid fa-spinner fa-spin" />
+              ) : (
+                <i className={`fa-solid ${updateMode ? "fa-pen" : "fa-plus"}`} />
+              )}
+              {loading
+                ? "Saving…"
+                : updateMode
+                  ? "Update Product"
+                  : "Add Product"}
             </button>
           </div>
         </form>

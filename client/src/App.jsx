@@ -15,14 +15,15 @@ import Contact from "./components/contact/Contact.jsx";
 import SizeGuide from "./components/size-guide/SizeGuide.jsx";
 import AdminPage from "./components/admin/admin-page/AdminPage.jsx";
 import CreateForm from "./components/admin/product-form/CreateForm.jsx";
+import Cart from "./components/cart/Cart.jsx";
+import Orders from "./components/orders/Orders.jsx";
+import Products from "./components/products/Products.jsx";
+import Profile from "./components/profile/Profile.jsx";
 // import UpdateForm from "./components/admin/product-form/UpdateForm.jsx";
-// import Cart from "./components/cart/Cart.jsx";
-// import AllProducts from "./components/all-products/AllProducts.jsx";
 // import Payment from "./components/payment/Payment.jsx";
 // import DeliveryInfo from "./components/delivery/DeliveryInfo.jsx";
 // import Verify from "./components/verify/Verify.jsx";
 // import OrderConfirmation from "./components/orderConfirmation/OrderConfirmation.jsx";
-// import MyOrders from "./components/myorders/MyOrders.jsx";
 
 const App = () => {
   return (
@@ -43,17 +44,20 @@ const App = () => {
         <Route path={"/size-guide"} element={<SizeGuide />} />
         <Route path={"/admin"} element={<AdminPage />} />
         <Route path={"/new-inventory"} element={<CreateForm />} />
+        <Route path={"/cart"} element={<Cart />} />
+        <Route path={"/products"} element={<Products />} />
+        <Route path={"/orders"} element={<Orders />} />
+        <Route path={"/profile"} element={<Profile />} />
         {/*
         
         
         <Route path={"/update-inventory/:id"} element={<UpdateForm />} />
-        <Route path={"/cart"} element={<Cart />} />
-        <Route path={"/products"} element={<AllProducts />} />
+        
         <Route path={"/payment"} element={<Payment />} />
         <Route path={"/delivery"} element={<DeliveryInfo />} />
         <Route path={"/verify"} element={<Verify />} />
         <Route path={"/confirmation"} element={<OrderConfirmation />} />
-        <Route path={"/myorders"} element={<MyOrders />} /> */}
+         */}
       </Routes>
       <Footer />
     </>

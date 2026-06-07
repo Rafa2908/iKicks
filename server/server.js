@@ -16,6 +16,24 @@ import invoiceRouter from "./routes/invoice.routes.js";
 import { stripeWebhook } from "./controllers/payment.controller.js";
 import "./utils/ImageUrlGenerator.js";
 
+const required = [
+  "JWT_SECRET",
+  "STRIPE_SECRET_KEY",
+  "RESEND_KEY",
+  "DBURL",
+  "CLOUDINARY_NAME",
+  "CLOUDINARY_API_KEY",
+  "CLOUDINARY_API_SECRET",
+  "FRONTEND_URL",
+];
+
+required.forEach((key) => {
+  if (!process.env[key]) {
+    console.error(`Missing required env variable: ${key}`);
+    process.exit(1);
+  }
+});
+
 dotenv.config();
 
 const app = express();
@@ -23,7 +41,10 @@ const app = express();
 app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 app.use(helmet());
-app.use(express.json({ limit: "20mb" }), express.urlencoded({ extended: true, limit: "20mb" }));
+app.use(
+  express.json({ limit: "20mb" }),
+  express.urlencoded({ extended: true, limit: "20mb" }),
+);
 app.use(cookieParser());
 app.use(
   cors({

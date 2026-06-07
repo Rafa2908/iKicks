@@ -80,6 +80,11 @@ export const registerUser = async (req, res) => {
       return res.status(200).json({ message: "Error signing up" });
     }
 
+    await sendRegistrationConfirmation(
+      newUser.rows[0].first_name,
+      newUser.rows[0].email,
+    );
+
     const token = jwt.sign(
       {
         userId: newUser.rows[0].id,
@@ -88,11 +93,6 @@ export const registerUser = async (req, res) => {
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
-    );
-
-    await sendRegistrationConfirmation(
-      newUser.rows[0].first_name,
-      newUser.rows[0].email,
     );
 
     res.cookie("token", token, {

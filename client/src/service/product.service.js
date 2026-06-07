@@ -62,6 +62,16 @@ export const filterProducts = async (filters) => {
 };
 
 //Admin
+export const updateProductById = async (editData) => {
+  try {
+    const res = await productInstance.put("/update/item", editData);
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const updateQuantityBySize = async (productData) => {
   try {
     const res = await productInstance.put("/update/quantity", productData);

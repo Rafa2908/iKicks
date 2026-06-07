@@ -5,6 +5,7 @@ import "./AdminPage.css";
 import {
   getProductInfo,
   getProductDetails,
+  updateProductById,
   updateQuantityBySize,
   updatePriceById,
 } from "../../../service/product.service";
@@ -157,8 +158,13 @@ const AdminPage = () => {
     setEditingProduct(full || product);
   };
 
-  const handleUpdateSubmit = async () => {
-    // TODO: call update product API with payload
+  const handleUpdateSubmit = async (payload) => {
+    await updateProductById({ ...payload, id: editingProduct.id });
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === editingProduct.id ? { ...p, ...payload } : p,
+      ),
+    );
     setEditingProduct(null);
   };
 

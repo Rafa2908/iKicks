@@ -524,7 +524,6 @@ export const sendPasswordResetCode = async (code, email) => {
   if (error) {
     console.error(error);
   }
-  console.log(data);
 };
 
 export const sendOrderConfirmation = async (order, email) => {
@@ -543,4 +542,10 @@ export const sendRegistrationConfirmation = async (name, email) => {
     subject: "Welcome to the iKicks family 👟",
     html: registrationHtml(name),
   });
+
+  if (error) {
+    return console.error({ error });
+  }
+
+  console.log({ data });
 };

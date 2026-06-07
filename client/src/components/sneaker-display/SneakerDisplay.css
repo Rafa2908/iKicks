@@ -199,13 +199,39 @@
   width: 100%;
 }
 
-.sd-add-btn:hover {
+.sd-add-btn:hover:not(:disabled) {
   background: var(--color-primary);
   transform: translateY(-1px);
 }
 
-.sd-add-btn:active {
+.sd-add-btn:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.sd-add-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sd-add-btn--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sd-spinner {
+  animation: sd-spin 0.75s linear infinite;
+}
+
+@keyframes sd-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Disclaimers ──────────────────────────────────────────── */
