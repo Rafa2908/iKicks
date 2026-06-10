@@ -1,22 +1,165 @@
-.user-name div input {
-  width: 204px;
-}
-
-.delivery-container main {
-  flex: 1;
-}
-
-.delivery-container aside {
-  flex: 1;
-  margin-top: 100px;
-}
-
-.shipping-container {
+.di-page {
+  min-height: 100vh;
+  background: #f5f5f7;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding: 52px 16px 72px;
 }
 
-.delivery-container {
-  gap: 220px;
+.di-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 44px 36px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  animation: di-slide-up 0.3s ease;
+}
+
+@keyframes di-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Header ──────────────────────────────────── */
+.di-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.di-brand {
+  font-family: var(--font-body, sans-serif);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #111;
+  margin: 0 0 4px;
+}
+
+.di-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+}
+
+/* ── Form ────────────────────────────────────── */
+.di-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.di-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.di-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.di-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #aaa;
+  font-size: 0.75rem;
+}
+
+.di-field input {
+  padding: 12px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #111;
+  background: #fafafa;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.di-field input::placeholder {
+  color: #bbb;
+}
+
+.di-field input:focus {
+  border-color: #116fc7;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(17, 111, 199, 0.12);
+}
+
+/* ── City / State / Zip row ──────────────────── */
+.di-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Submit ──────────────────────────────────── */
+.di-submit {
+  margin-top: 12px;
+  padding: 13px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  width: 100%;
+}
+
+.di-submit:hover {
+  background: #116fc7;
+  transform: translateY(-1px);
+}
+
+.di-submit:active {
+  transform: translateY(0);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 600px) {
+  .di-card {
+    padding: 32px 24px 28px;
+    border-radius: 16px;
+  }
+
+  .di-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .di-row .di-field:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 400px) {
+  .di-card {
+    padding: 28px 18px 24px;
+  }
+
+  .di-row {
+    grid-template-columns: 1fr;
+  }
+
+  .di-row .di-field:last-child {
+    grid-column: unset;
+  }
 }

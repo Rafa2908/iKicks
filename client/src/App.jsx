@@ -20,9 +20,9 @@ import Orders from "./components/orders/Orders.jsx";
 import Products from "./components/products/Products.jsx";
 import Profile from "./components/profile/Profile.jsx";
 import ResetPassword from "./components/reset-password/ResetPassword.jsx";
+import DeliveryInfo from "./components/delivery/DeliveryInfo.jsx";
+import Payment from "./components/payment/Payment.jsx";
 // import UpdateForm from "./components/admin/product-form/UpdateForm.jsx";
-// import Payment from "./components/payment/Payment.jsx";
-// import DeliveryInfo from "./components/delivery/DeliveryInfo.jsx";
 // import Verify from "./components/verify/Verify.jsx";
 // import OrderConfirmation from "./components/orderConfirmation/OrderConfirmation.jsx";
 
@@ -50,13 +50,15 @@ const App = () => {
         <Route path={"/orders"} element={<Orders />} />
         <Route path={"/profile"} element={<Profile />} />
         <Route path={"/reset-password"} element={<ResetPassword />} />
+        <Route path={"/delivery"} element={<DeliveryInfo />} />
+        <Route path={"/payment"} element={<Payment />} />
         {/*
         
         
         <Route path={"/update-inventory/:id"} element={<UpdateForm />} />
         
-        <Route path={"/payment"} element={<Payment />} />
-        <Route path={"/delivery"} element={<DeliveryInfo />} />
+        
+        
         <Route path={"/verify"} element={<Verify />} />
         <Route path={"/confirmation"} element={<OrderConfirmation />} />
          */}

@@ -1,228 +1,142 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import "./DeliveryInfo.css";
-// import { stripePayment } from "../../service/client.service";
+import { CartContext } from "../../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const DeliveryInfo = () => {
+  const navigate = useNavigate();
+
   const [deliveryInfo, setDeliveryInfo] = useState({
-    first_name: "",
-    last_name: "",
-    address1: "",
-    address2: "",
+    recipient_name: "",
+    address_1: "",
+    address_2: "",
     city: "",
     state: "",
-    zip_code: "",
+    zipcode: "",
     phone_number: "",
   });
 
-  // Set deliveryCharge as a number
-  const [deliveryCharge, setDeliveryCharge] = useState(4.99);
-
-  // const { cartDetails } = useContext(CartContext);
-  const cartDetails = [];
-
-  const subtotal = cartDetails.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
-
-  const taxRate = 0.1;
-  const taxAmount = subtotal * taxRate;
-
-  const totalOrderAmount = subtotal + taxAmount;
-
+  const { cart, total } = useContext(CartContext);
   const address1Ref = useRef(null);
-
-  // Google Maps autocomplete disabled — re-enable when ready by uncommenting this block
-  // and the script tag in index.html. Key is in VITE_GOOGLE_MAPS_API_KEY (.env).
-  useEffect(() => {}, []);
 
   const updateDeliveryInfo = (e) => {
     const { name, value } = e.target;
     setDeliveryInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Update deliveryCharge to a number
-  const updateDeliveryCharge = (e) => {
-    setDeliveryCharge(parseFloat(e.target.value));
-  };
-
-  const placeOrder = async (e) => {
+  const handleDeliveryInfo = async (e) => {
     e.preventDefault();
-
-    // try {
-    //   const response = await stripePayment(orderData, token);
-    //   console.log("Stripe Payment Response:", response);
-
-    //   if (response.success) {
-    //     const { session_url } = response;
-    //     window.location.replace(session_url);
-    //   } else {
-    //     console.error("Payment was not successful:", response);
-    //   }
-    // } catch (error) {
-    //   console.error("Error during payment:", error);
-    // }
+    navigate("/payment");
+    // payment logic goes here
   };
 
   return (
-    <div className="shipping-container">
-      <div className="delivery-container mb-5 d-flex justify-content-between align-items-start">
-        <main className="card shadow w-50 p-3">
-          <h2 className="text-center mt-5 mb-5">Delivery Information</h2>
-          <form className="card-body" onSubmit={placeOrder}>
-            <div className="user-name d-flex justify-content-between align-items-center gap-3">
-              <div className="mb-4 form-floating">
-                <input
-                  type="text"
-                  name="first_name"
-                  className="form-control"
-                  placeholder="First Name:"
-                  onChange={updateDeliveryInfo}
-                  value={deliveryInfo.first_name}
-                  required
-                />
-                <label htmlFor="first_name">First Name:</label>
-              </div>
-              <div className="mb-4 form-floating">
-                <input
-                  type="text"
-                  name="last_name"
-                  className="form-control"
-                  placeholder="Last Name:"
-                  onChange={updateDeliveryInfo}
-                  value={deliveryInfo.last_name}
-                  required
-                />
-                <label htmlFor="last_name">Last Name:</label>
-              </div>
-            </div>
-            <div className="mb-4 form-floating">
+    <div className="di-page">
+      <div className="di-card">
+        <div className="di-header">
+          <h1 className="di-brand">iKicks</h1>
+          <p className="di-subtitle">Where should we send your order?</p>
+        </div>
+
+        <form className="di-form" onSubmit={handleDeliveryInfo} noValidate>
+          <div className="di-field">
+            <label htmlFor="recipient_name">Recipient Name</label>
+            <input
+              id="recipient_name"
+              type="text"
+              name="recipient_name"
+              placeholder="Full name"
+              value={deliveryInfo.recipient_name}
+              onChange={updateDeliveryInfo}
+              autoFocus
+              required
+            />
+          </div>
+
+          <div className="di-field">
+            <label htmlFor="address_1">Address Line 1</label>
+            <input
+              id="address_1"
+              type="text"
+              name="address_1"
+              placeholder="Street address"
+              value={deliveryInfo.address_1}
+              onChange={updateDeliveryInfo}
+              ref={address1Ref}
+              required
+            />
+          </div>
+
+          <div className="di-field">
+            <label htmlFor="address_2">
+              Address Line 2 <span className="di-optional">(optional)</span>
+            </label>
+            <input
+              id="address_2"
+              type="text"
+              name="address_2"
+              placeholder="Apt, suite, unit, etc."
+              value={deliveryInfo.address_2}
+              onChange={updateDeliveryInfo}
+            />
+          </div>
+
+          <div className="di-row">
+            <div className="di-field">
+              <label htmlFor="city">City</label>
               <input
+                id="city"
                 type="text"
-                name="address1"
-                className="form-control"
-                placeholder="Address 1:"
+                name="city"
+                placeholder="City"
+                value={deliveryInfo.city}
                 onChange={updateDeliveryInfo}
-                value={deliveryInfo.address1}
-                ref={address1Ref}
                 required
               />
-              <label htmlFor="address1">Address 1:</label>
             </div>
-            <div className="mb-4 form-floating">
+            <div className="di-field">
+              <label htmlFor="state">State</label>
               <input
+                id="state"
                 type="text"
-                name="address2"
-                className="form-control"
-                placeholder="Address 2:"
+                name="state"
+                placeholder="State"
+                value={deliveryInfo.state}
                 onChange={updateDeliveryInfo}
-                value={deliveryInfo.address2}
-              />
-              <label htmlFor="address2">Address 2:</label>
-            </div>
-
-            <div className="state-zip d-flex justify-content-center align-items-center gap-3">
-              <div className="mb-4 form-floating">
-                <input
-                  type="text"
-                  name="city"
-                  className="form-control"
-                  placeholder="City:"
-                  onChange={updateDeliveryInfo}
-                  value={deliveryInfo.city}
-                  required
-                />
-                <label htmlFor="city">City:</label>
-              </div>
-              <div className="mb-4 form-floating">
-                <input
-                  type="text"
-                  name="state"
-                  className="form-control"
-                  placeholder="State:"
-                  onChange={updateDeliveryInfo}
-                  value={deliveryInfo.state}
-                  required
-                />
-                <label htmlFor="state">State:</label>
-              </div>
-              <div className="mb-4 form-floating">
-                <input
-                  type="text"
-                  name="zip_code"
-                  className="form-control"
-                  placeholder="Zip Code:"
-                  onChange={updateDeliveryInfo}
-                  value={deliveryInfo.zip_code}
-                  required
-                />
-                <label htmlFor="zip_code">Zip Code:</label>
-              </div>
-            </div>
-            <div className="mb-4 form-floating">
-              <input
-                type="text"
-                name="phone_number"
-                placeholder="Phone Number:"
-                className="form-control"
-                onChange={updateDeliveryInfo}
-                value={deliveryInfo.phone_number}
                 required
               />
-              <label htmlFor="phone_number">Phone Number:</label>
             </div>
-            <div className="mt-4 text-center">
-              <button className="btn btn-outline-primary" type="submit">
-                Proceed to Payment
-              </button>
-            </div>
-          </form>
-        </main>
-        <aside className="card p-3">
-          <div className="aside-container mb-5 card-body">
-            <h2 className="mb-5 mt-4 text-center">Order Detail</h2>
-            <div className="subtotal">
-              <p>Subtotal:</p>
-              <p>${subtotal.toFixed(2)}</p>
-            </div>
-            <p className="mb-4">Shipping</p>
-            <div className="shipping">
-              <div className="shipping-1">
-                <input
-                  type="radio"
-                  name="shipping"
-                  value={4.99}
-                  checked={deliveryCharge === 4.99}
-                  onChange={updateDeliveryCharge}
-                />
-                <p>Standard Shipping: (5-7 days):</p>
-              </div>
-              <p>$4.99</p>
-            </div>
-            <div className="shipping">
-              <div className="shipping-1">
-                <input
-                  type="radio"
-                  name="shipping"
-                  value={9.99}
-                  checked={deliveryCharge === 9.99}
-                  onChange={updateDeliveryCharge}
-                />
-                <p>Express Shipping: (2-3 days):</p>
-              </div>
-              <p>$9.99</p>
-            </div>
-
-            <div className="estimated-taxes">
-              <p>Estimated Taxes (10%):</p>
-              <p>${taxAmount.toFixed(2)}</p>
-            </div>
-            <div className="total-order">
-              <p>Total:</p>
-              <p>${(totalOrderAmount + deliveryCharge).toFixed(2)}</p>
+            <div className="di-field">
+              <label htmlFor="zipcode">Zip Code</label>
+              <input
+                id="zipcode"
+                type="text"
+                name="zipcode"
+                placeholder="00000"
+                value={deliveryInfo.zipcode}
+                onChange={updateDeliveryInfo}
+                required
+              />
             </div>
           </div>
-        </aside>
+
+          <div className="di-field">
+            <label htmlFor="phone_number">Phone Number</label>
+            <input
+              id="phone_number"
+              type="tel"
+              name="phone_number"
+              placeholder="+1 (555) 000-0000"
+              value={deliveryInfo.phone_number}
+              onChange={updateDeliveryInfo}
+              required
+            />
+          </div>
+
+          <button type="submit" className="di-submit">
+            Proceed to Payment
+          </button>
+        </form>
       </div>
     </div>
   );
