@@ -19,6 +19,7 @@ import Cart from "./components/cart/Cart.jsx";
 import Orders from "./components/orders/Orders.jsx";
 import Products from "./components/products/Products.jsx";
 import Profile from "./components/profile/Profile.jsx";
+import ResetPassword from "./components/reset-password/ResetPassword.jsx";
 // import UpdateForm from "./components/admin/product-form/UpdateForm.jsx";
 // import Payment from "./components/payment/Payment.jsx";
 // import DeliveryInfo from "./components/delivery/DeliveryInfo.jsx";
@@ -48,6 +49,7 @@ const App = () => {
         <Route path={"/products"} element={<Products />} />
         <Route path={"/orders"} element={<Orders />} />
         <Route path={"/profile"} element={<Profile />} />
+        <Route path={"/reset-password"} element={<ResetPassword />} />
         {/*
         
         

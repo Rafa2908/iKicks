@@ -17,6 +17,7 @@ const UserContext = createContext({
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState({});
+  const [authLoading, setAuthLoading] = useState(true);
   const [userInfo, setUserInfo] = useState({});
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
@@ -25,7 +26,8 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       const res = await getMe();
-      setUser(res);
+      setUser(res ?? {});
+      setAuthLoading(false);
     };
     fetchUser();
   }, []);
@@ -34,6 +36,7 @@ const UserProvider = ({ children }) => {
     () => ({
       user,
       setUser,
+      authLoading,
       userInfo,
       setUserInfo,
       products,
@@ -43,7 +46,7 @@ const UserProvider = ({ children }) => {
       buttonColor,
       setButtonColor,
     }),
-    [user, userInfo, products, message, buttonColor],
+    [user, authLoading, userInfo, products, message, buttonColor],
   );
 
   return (

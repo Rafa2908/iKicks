@@ -253,31 +253,30 @@ export const getUserById = async (req, res) => {
 };
 
 export const updateUserInfo = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user;
   const { firstName, lastName, email } = req.body;
 
   try {
     if (!firstName || !lastName || !email)
       return res.status(404).json({ message: "All fields must be filled out" });
 
-    const user = await pool.query(
-      `
-      SELECT email FROM users WHERE id=$1
-      `,
-      [userId],
-    );
-
-    if (user.rowCount === 0)
-      return res.status(404).json({ message: "No user data available" });
+    if (!emailVerification(email)) {
+      return res.status(400).json({ message: "Invalid email provided" });
+    }
 
     const update = await pool.query(
       `
       UPDATE users
       SET first_name=$1, last_name=$2, email=$3
       WHERE id=$4
+      RETURNING id
       `,
       [firstName, lastName, email, userId],
     );
+
+    if (update.rowCount === 0) {
+      return res.status(400).json({ message: "Error updating profile" });
+    }
 
     return res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
@@ -402,6 +401,8 @@ export const verifyCode = async (req, res) => {
   const { userId, resetCode } = req.body;
 
   try {
+    console.log("User Id: " + userId, "Code: " + resetCode);
+
     if (!userId || !resetCode) {
       return res.status(400).json({ message: "Data not provided" });
     }
@@ -439,7 +440,14 @@ export const verifyCode = async (req, res) => {
       { expiresIn: "15m" },
     );
 
-    return res.status(200).json({ resetToken });
+    res.cookie("resetToken", resetToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.status(200).json({ message: "Code verified" });
   } catch (error) {
     console.error(error);
 
@@ -447,7 +455,8 @@ export const verifyCode = async (req, res) => {
   }
 };
 export const resetPassword = async (req, res) => {
-  const { resetToken, newPassword, confirmPassword } = req.body;
+  const resetToken = req.cookies.resetToken;
+  const { newPassword, confirmPassword } = req.body;
 
   try {
     const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
@@ -493,7 +502,24 @@ export const resetPassword = async (req, res) => {
       [update.rows[0].id],
     );
 
-    res.cookie("token", resetToken, {
+    res.clearCookie("resetToken");
+
+    const user = await pool.query(
+      `SELECT id, email, role FROM users WHERE email=$1`,
+      [email],
+    );
+
+    const authToken = jwt.sign(
+      {
+        userId: user.rows[0].id,
+        email: user.rows[0].email,
+        role: user.rows[0].role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("token", authToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

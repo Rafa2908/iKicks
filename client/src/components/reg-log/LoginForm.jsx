@@ -109,7 +109,12 @@ const LoginForm = () => {
           </div>
 
           <div className="reg-field">
-            <label htmlFor="password">Password</label>
+            <div className="reg-field-header">
+              <label htmlFor="password">Password</label>
+              <Link to="/reset-password" className="reg-forgot">
+                Forgot password?
+              </Link>
+            </div>
             <input
               id="password"
               type="password"

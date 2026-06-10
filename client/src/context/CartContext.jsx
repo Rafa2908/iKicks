@@ -21,7 +21,6 @@ const CartProvider = ({ children }) => {
 
   const fetchCart = async () => {
     const res = await getCartItemsPreview();
-    console.log(res);
 
     setCart(res?.products);
     setTotal(Number(res?.total));

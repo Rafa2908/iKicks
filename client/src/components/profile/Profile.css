@@ -927,6 +927,43 @@
   border-color: #fed7d7;
 }
 
+/* ── Save success banner ─────────────────────────────── */
+.pp-save-success {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  animation: pp-fade-in 0.25s ease;
+}
+
+.pp-save-success i {
+  font-size: 1.6rem;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.pp-save-success-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 2px;
+}
+
+.pp-save-success-sub {
+  font-size: 0.8rem;
+  color: #16a34a;
+  margin: 0;
+}
+
+@keyframes pp-fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Settings card ───────────────────────────────────── */
 .pp-settings-card {
   background: #fff;
@@ -1095,42 +1132,143 @@
   .pp-main,
   .pp-collapsed .pp-main {
     margin-left: 60px;
-    padding: 24px 16px;
+    padding: 20px 14px;
   }
 
   .pp-stats-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .pp-hero-card {
     flex-wrap: wrap;
-    gap: 16px;
-    padding: 20px;
+    gap: 14px;
+    padding: 18px;
   }
 
   .pp-hero-edit-btn span {
     display: none;
   }
 
+  .pp-hero-name {
+    font-size: 1.1rem;
+  }
+
   .pp-settings-card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .pp-form-row {
     flex-direction: column;
+    gap: 10px;
   }
 
   .pp-form-field--sm {
     width: 100%;
   }
+
+  .pp-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .pp-page-title {
+    font-size: 1.2rem;
+  }
+
+  .pp-security-item {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .pp-security-body {
+    min-width: 0;
+    flex-basis: calc(100% - 58px);
+  }
+
+  .pp-security-item .pp-outline-btn,
+  .pp-security-item .pp-danger-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pp-addr-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-order-card {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .pp-order-full-header {
+    padding: 12px 14px;
+  }
+
+  .pp-section-header {
+    padding: 14px 16px;
+  }
+
+  .pp-empty-state--center {
+    padding: 40px 20px;
+  }
 }
 
 @media (max-width: 480px) {
+  .pp-main,
+  .pp-collapsed .pp-main {
+    padding: 16px 10px;
+  }
+
+  .pp-stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-stat-card {
+    padding: 16px 18px;
+  }
+
+  .pp-stat-value {
+    font-size: 1.3rem;
+  }
+
+  .pp-hero-card {
+    padding: 14px;
+  }
+
+  .pp-hero-avatar {
+    width: 54px;
+    height: 54px;
+    font-size: 1.1rem;
+  }
+
   .pp-order-full-images {
     display: none;
   }
 
   .pp-order-full-meta {
     padding-left: 0;
+  }
+
+  .pp-order-full-header {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .pp-order-full-total {
+    font-size: 0.875rem;
+  }
+
+  .pp-addr-card {
+    padding: 16px;
+  }
+
+  .pp-security-list {
+    max-width: 100%;
+  }
+
+  .pp-settings-card {
+    max-width: 100%;
   }
 }

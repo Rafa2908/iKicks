@@ -28,7 +28,7 @@ const EMPTY_ADDRESS = {
 };
 
 const Profile = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, authLoading } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -46,8 +46,8 @@ const Profile = () => {
   const [addressError, setAddressError] = useState("");
 
   const [settingsForm, setSettingsForm] = useState({
-    first_name: "",
-    last_name: "",
+    firstName: "",
+    lastName: "",
     email: "",
   });
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -56,8 +56,8 @@ const Profile = () => {
   useEffect(() => {
     if (user?.first_name) {
       setSettingsForm({
-        first_name: user.first_name ?? "",
-        last_name: user.last_name ?? "",
+        firstName: user.first_name ?? "",
+        lastName: user.last_name ?? "",
         email: user.email ?? "",
       });
     }
@@ -93,8 +93,17 @@ const Profile = () => {
     const res = await updateUserInfo(settingsForm);
     setSettingsSaving(false);
     if (res) {
+      setUser((prev) => ({
+        ...prev,
+        first_name: settingsForm.firstName,
+        last_name: settingsForm.lastName,
+        email: settingsForm.email,
+      }));
       setSettingsMsg({ text: "Profile updated successfully.", ok: true });
-      setUser((prev) => ({ ...prev, ...settingsForm }));
+      setTimeout(() => {
+        setSettingsMsg({ text: "", ok: true });
+        setActiveTab("overview");
+      }, 1800);
     } else {
       setSettingsMsg({
         text: "Could not update profile. Try again.",
@@ -122,6 +131,14 @@ const Profile = () => {
     const res = await deleteAddress(shippingId);
     if (res) setAddresses((prev) => prev.filter((a) => a.id !== shippingId));
   };
+
+  if (authLoading) {
+    return (
+      <div className="pp-gate">
+        <i className="fa-solid fa-spinner pp-spinner pp-gate-icon" />
+      </div>
+    );
+  }
 
   if (!user || Object.keys(user).length === 0) {
     return (
@@ -602,17 +619,29 @@ const Profile = () => {
               </div>
             </div>
 
+            {settingsMsg.ok && settingsMsg.text && (
+              <div className="pp-save-success">
+                <i className="fa-solid fa-circle-check" />
+                <div>
+                  <p className="pp-save-success-title">Changes saved!</p>
+                  <p className="pp-save-success-sub">
+                    Returning to your profile…
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="pp-settings-card">
               <form onSubmit={handleSettingsSave}>
                 <div className="pp-form-row">
                   <div className="pp-form-field pp-form-field--grow">
                     <label>First Name</label>
                     <input
-                      value={settingsForm.first_name}
+                      value={settingsForm.firstName}
                       onChange={(e) =>
                         setSettingsForm((p) => ({
                           ...p,
-                          first_name: e.target.value,
+                          firstName: e.target.value,
                         }))
                       }
                       placeholder="First name"
@@ -621,11 +650,11 @@ const Profile = () => {
                   <div className="pp-form-field pp-form-field--grow">
                     <label>Last Name</label>
                     <input
-                      value={settingsForm.last_name}
+                      value={settingsForm.lastName}
                       onChange={(e) =>
                         setSettingsForm((p) => ({
                           ...p,
-                          last_name: e.target.value,
+                          lastName: e.target.value,
                         }))
                       }
                       placeholder="Last name"

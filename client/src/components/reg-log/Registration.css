@@ -108,6 +108,30 @@
   margin-bottom: 6px;
 }
 
+.reg-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.reg-field-header label {
+  margin-bottom: 0;
+}
+
+.reg-forgot {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #116fc7;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.reg-forgot:hover {
+  color: #0d56a0;
+  text-decoration: underline;
+}
+
 .reg-field label {
   font-size: 0.78rem;
   font-weight: 600;
