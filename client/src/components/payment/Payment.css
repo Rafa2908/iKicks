@@ -576,6 +576,27 @@
   gap: 12px;
 }
 
+/* ── Stripe card element wrapper ─────────────── */
+.ck-stripe-card-wrap {
+  padding: 11px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ck-stripe-card-wrap:focus-within {
+  border-color: #116fc7;
+  box-shadow: 0 0 0 3px rgba(17, 111, 199, 0.12);
+}
+
+/* ── Payment error ────────────────────────────── */
+.ck-error {
+  font-size: 0.83rem;
+  color: #e53935;
+  margin: 0;
+}
+
 /* ── Submit button ────────────────────────────── */
 .ck-submit {
   display: flex;

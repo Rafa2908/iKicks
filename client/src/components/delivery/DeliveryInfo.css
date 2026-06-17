@@ -102,6 +102,124 @@
   box-shadow: 0 0 0 3px rgba(17, 111, 199, 0.12);
 }
 
+/* ── Saved addresses ─────────────────────────── */
+.di-saved-section {
+  margin-bottom: 8px;
+}
+
+.di-saved-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #444;
+  margin: 0 0 10px;
+}
+
+.di-saved-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.83rem;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.di-saved-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #e0e0e0;
+  border-top-color: #116fc7;
+  border-radius: 50%;
+  animation: di-spin 0.7s linear infinite;
+  flex-shrink: 0;
+  will-change: transform;
+}
+
+@keyframes di-spin {
+  to { transform: rotate(360deg); }
+}
+
+.di-address-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.di-address-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fafafa;
+  cursor: pointer;
+  text-align: left;
+  flex: 1 1 160px;
+  min-width: 140px;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.di-address-card:hover {
+  border-color: #116fc7;
+  background: #f8fbff;
+}
+
+.di-address-card--selected {
+  border-color: #116fc7;
+  background: #f0f7ff;
+  box-shadow: 0 0 0 3px rgba(17, 111, 199, 0.12);
+}
+
+.di-address-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #116fc7;
+  font-size: 0.85rem;
+}
+
+.di-address-line {
+  font-size: 0.83rem;
+  color: #333;
+  line-height: 1.4;
+}
+
+.di-address-card--new {
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #666;
+  min-height: 72px;
+  flex: 0 1 auto;
+}
+
+.di-address-card--new span {
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+.di-address-new-icon {
+  font-size: 1rem;
+  color: #aaa;
+  transition: color 0.2s;
+}
+
+.di-address-card--new:hover .di-address-new-icon,
+.di-address-card--new.di-address-card--selected .di-address-new-icon {
+  color: #116fc7;
+}
+
+/* ── Error ───────────────────────────────────── */
+.di-error {
+  font-size: 0.83rem;
+  color: #e53935;
+  margin: 0;
+}
+
 /* ── City / State / Zip row ──────────────────── */
 .di-row {
   display: grid;

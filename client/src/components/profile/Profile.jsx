@@ -6,7 +6,7 @@ import { logoutUser, updateUserInfo } from "../../service/user.service";
 import { getOrdersPreview } from "../../service/order.service";
 import {
   getAddresses,
-  addAddress,
+  addShippingAddress,
   deleteAddress,
 } from "../../service/shipping.service";
 
@@ -116,7 +116,7 @@ const Profile = () => {
     e.preventDefault();
     setAddressSaving(true);
     setAddressError("");
-    const res = await addAddress(newAddress);
+    const res = await addShippingAddress(newAddress);
     setAddressSaving(false);
     if (res) {
       setAddresses((prev) => [...prev, { id: res.shippingId, ...newAddress }]);

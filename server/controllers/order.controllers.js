@@ -30,7 +30,7 @@ export const placeOrder = async (req, res) => {
     const cart = await pool.query(
       `
       SELECT c.id FROM cart c
-      JOIN shipping s
+      JOIN shipping_addresses s
       ON c.user_id=s.user_id
       WHERE c.user_id=$1 AND s.id=$2
       `,
@@ -108,7 +108,7 @@ export const placeOrder = async (req, res) => {
       INSERT INTO shipping_orders(order_id, shipping_address_id)
       VALUES($1, $2)
       `,
-      [orderId, newOrder.rows[0].shipping_address_id],
+      [orderId, addressId],
     );
 
     await pool.query(
@@ -121,7 +121,9 @@ export const placeOrder = async (req, res) => {
 
     await pool.query("COMMIT");
 
-    return res.status(201).json({ message: "Order processed successfully" });
+    return res
+      .status(201)
+      .json({ message: "Order processed successfully", orderId });
   } catch (error) {
     console.error(error);
 

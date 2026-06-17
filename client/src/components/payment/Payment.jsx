@@ -1,6 +1,17 @@
 import { useState, useContext } from "react";
 import "./Payment.css";
 import { CartContext } from "../../context/CartContext";
+import { placeOrder } from "../../service/order.service";
+import { makePayment } from "../../service/payment.service";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const VISIBLE_LIMIT = 4;
 
@@ -31,8 +42,21 @@ const BANKS = [
   },
 ];
 
-const Payment = () => {
-  const { cart, total } = useContext(CartContext);
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: "16px",
+      color: "#1a1a1a",
+      "::placeholder": { color: "#aab7c4" },
+    },
+    invalid: { color: "#e53935" },
+  },
+};
+
+const PaymentForm = () => {
+  const { cart, total, deliveryInfo } = useContext(CartContext);
+  const stripe = useStripe();
+  const elements = useElements();
 
   const items = Array.isArray(cart) ? cart : [];
   const subtotal = Number(total) || 0;
@@ -42,59 +66,20 @@ const Payment = () => {
   const [showAll, setShowAll] = useState(false);
   const [method, setMethod] = useState(null);
   const [flipped, setFlipped] = useState(null);
-  const [cardData, setCardData] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: "",
-  });
-  const [showNumber, setShowNumber] = useState(false);
   const [copied, setCopied] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const visibleItems = showAll ? items : items.slice(0, VISIBLE_LIMIT);
   const hiddenCount = items.length - VISIBLE_LIMIT;
 
-  /* ── Card input helpers ────────────────────── */
-  const formatCardNumber = (val) => {
-    const digits = val.replace(/\D/g, "").slice(0, 16);
-    return digits.replace(/(.{4})(?=.)/g, "$1 ");
-  };
-
-  const formatExpiry = (val) => {
-    const digits = val.replace(/\D/g, "").slice(0, 4);
-    return digits.length > 2 ? digits.slice(0, 2) + "/" + digits.slice(2) : digits;
-  };
-
-  const handleCardInput = (field, val) => {
-    if (field === "number") {
-      setCardData((p) => ({ ...p, number: formatCardNumber(val) }));
-    } else if (field === "expiry") {
-      setCardData((p) => ({ ...p, expiry: formatExpiry(val) }));
-    } else if (field === "cvv") {
-      setCardData((p) => ({ ...p, cvv: val.replace(/\D/g, "").slice(0, 4) }));
-    } else {
-      setCardData((p) => ({ ...p, [field]: val }));
-    }
-  };
-
-  const previewNumber = cardData.number
-    ? showNumber
-      ? cardData.number
-      : cardData.number.replace(/\d/g, "●")
-    : "●●●● ●●●● ●●●● ●●●●";
-
-  /* ── Payment handlers ──────────────────────── */
   const handleCashOrder = async () => {
     // TODO: implement cash reservation order logic
   };
 
   const handleBankTransfer = async () => {
     // TODO: implement bank transfer order logic
-  };
-
-  const handleCreditCardPayment = async (e) => {
-    e.preventDefault();
-    // TODO: send payment intent to backend
   };
 
   const handleCopy = (text, bankId) => {
@@ -105,6 +90,48 @@ const Payment = () => {
 
   const toggleMethod = (selected) =>
     setMethod((prev) => (prev === selected ? null : selected));
+
+  const handleCreditCardPayment = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setLoading(true);
+    setPaymentError(null);
+
+    const orderRes = await placeOrder(deliveryInfo);
+    if (!orderRes?.orderId) {
+      setPaymentError("Failed to place order. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    const paymentRes = await makePayment(orderRes.orderId);
+    if (!paymentRes?.clientSecret) {
+      setPaymentError("Payment initialization failed. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    const cardElement = elements.getElement(CardElement);
+    const { error } = await stripe.confirmCardPayment(paymentRes.clientSecret, {
+      payment_method: { card: cardElement },
+    });
+
+    if (error) {
+      setPaymentError(error.message);
+    } else {
+      setSuccess(true);
+    }
+    setLoading(false);
+  };
+
+  if (success) {
+    return (
+      <div className="ck-page">
+        <p>Payment successful! Check your email for confirmation.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="ck-page">
@@ -119,7 +146,11 @@ const Payment = () => {
             {visibleItems.map((item, idx) => (
               <div key={item.sizeId ?? idx} className="ck-item">
                 <div className="ck-item-img-wrap">
-                  <img src={item.image} alt={item.name} className="ck-item-img" />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="ck-item-img"
+                  />
                 </div>
                 <div className="ck-item-info">
                   <p className="ck-item-brand">{item.brand}</p>
@@ -139,7 +170,10 @@ const Payment = () => {
           </div>
 
           {hiddenCount > 0 && (
-            <button className="ck-show-more" onClick={() => setShowAll((v) => !v)}>
+            <button
+              className="ck-show-more"
+              onClick={() => setShowAll((v) => !v)}
+            >
               <i className={`fa-solid fa-chevron-${showAll ? "up" : "down"}`} />
               {showAll
                 ? "Show less"
@@ -232,12 +266,16 @@ const Payment = () => {
                       tabIndex={0}
                       className={`ck-bank-card${flipped === bank.id ? " ck-bank-card--flipped" : ""}`}
                       onClick={() =>
-                        setFlipped((prev) => (prev === bank.id ? null : bank.id))
+                        setFlipped((prev) =>
+                          prev === bank.id ? null : bank.id,
+                        )
                       }
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          setFlipped((prev) => (prev === bank.id ? null : bank.id));
+                          setFlipped((prev) =>
+                            prev === bank.id ? null : bank.id,
+                          );
                         }
                       }}
                       aria-label={`View ${bank.name} account details`}
@@ -257,9 +295,13 @@ const Payment = () => {
                         {/* Back */}
                         <div className="ck-bank-face ck-bank-back">
                           <p className="ck-bank-back-label">Account Name</p>
-                          <p className="ck-bank-back-value">{bank.accountName}</p>
+                          <p className="ck-bank-back-value">
+                            {bank.accountName}
+                          </p>
                           <p className="ck-bank-back-label">Account Number</p>
-                          <p className="ck-bank-back-number">{bank.accountNumber}</p>
+                          <p className="ck-bank-back-number">
+                            {bank.accountNumber}
+                          </p>
                           <button
                             type="button"
                             className={`ck-bank-copy-btn${copied === bank.id ? " ck-bank-copy-btn--copied" : ""}`}
@@ -268,7 +310,9 @@ const Payment = () => {
                               handleCopy(bank.accountNumber, bank.id);
                             }}
                           >
-                            <i className={`fa-solid fa-${copied === bank.id ? "check" : "copy"}`} />
+                            <i
+                              className={`fa-solid fa-${copied === bank.id ? "check" : "copy"}`}
+                            />
                             {copied === bank.id ? "Copied!" : "Copy"}
                           </button>
                         </div>
@@ -303,83 +347,24 @@ const Payment = () => {
                 onSubmit={handleCreditCardPayment}
                 noValidate
               >
-                {/* Card visual */}
-                <div className="ck-card-visual">
-                  <div className="ck-card-visual-chip">
-                    <i className="fa-solid fa-microchip" />
-                  </div>
-                  <p className="ck-card-visual-number">{previewNumber}</p>
-                  <div className="ck-card-visual-bottom">
-                    <span>{cardData.name || "CARDHOLDER NAME"}</span>
-                    <span>{cardData.expiry || "MM/YY"}</span>
-                  </div>
-                </div>
-
-                {/* Number */}
                 <div className="ck-field">
-                  <label>Card Number</label>
-                  <div className="ck-field-wrap">
-                    <input
-                      type={showNumber ? "text" : "password"}
-                      placeholder="1234 5678 9012 3456"
-                      value={cardData.number}
-                      onChange={(e) => handleCardInput("number", e.target.value)}
-                      autoComplete="cc-number"
-                      inputMode="numeric"
-                    />
-                    <button
-                      type="button"
-                      className="ck-eye"
-                      onClick={() => setShowNumber((v) => !v)}
-                      tabIndex={-1}
-                      aria-label={showNumber ? "Hide card number" : "Show card number"}
-                    >
-                      <i className={`fa-solid fa-eye${showNumber ? "-slash" : ""}`} />
-                    </button>
+                  <label>Card Details</label>
+                  <div className="ck-stripe-card-wrap">
+                    <CardElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
                 </div>
 
-                {/* Expiry + CVV */}
-                <div className="ck-field-row">
-                  <div className="ck-field">
-                    <label>Expiry</label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      value={cardData.expiry}
-                      onChange={(e) => handleCardInput("expiry", e.target.value)}
-                      autoComplete="cc-exp"
-                      inputMode="numeric"
-                    />
-                  </div>
-                  <div className="ck-field">
-                    <label>CVV</label>
-                    <input
-                      type="password"
-                      placeholder="•••"
-                      value={cardData.cvv}
-                      onChange={(e) => handleCardInput("cvv", e.target.value)}
-                      autoComplete="cc-csc"
-                      inputMode="numeric"
-                    />
-                  </div>
-                </div>
+                {paymentError && (
+                  <p className="ck-error">{paymentError}</p>
+                )}
 
-                {/* Name */}
-                <div className="ck-field">
-                  <label>Cardholder Name</label>
-                  <input
-                    type="text"
-                    placeholder="Full name on card"
-                    value={cardData.name}
-                    onChange={(e) => handleCardInput("name", e.target.value)}
-                    autoComplete="cc-name"
-                  />
-                </div>
-
-                <button type="submit" className="ck-submit">
-                  <i className="fa-solid fa-lock" /> Pay $
-                  {grandTotal.toFixed(2)}
+                <button
+                  type="submit"
+                  className="ck-submit"
+                  disabled={!stripe || loading}
+                >
+                  <i className="fa-solid fa-lock" />
+                  {loading ? " Processing…" : ` Pay $${grandTotal.toFixed(2)}`}
                 </button>
               </form>
             )}
@@ -389,5 +374,11 @@ const Payment = () => {
     </div>
   );
 };
+
+const Payment = () => (
+  <Elements stripe={stripePromise}>
+    <PaymentForm />
+  </Elements>
+);
 
 export default Payment;

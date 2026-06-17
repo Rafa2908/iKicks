@@ -1,7 +1,7 @@
-import "./Abovenav.css";
+import "./AboveNav.css";
 import { Link } from "react-router-dom";
 
-const Abovenav = () => {
+const AboveNav = () => {
   return (
     <div className="abovenav">
       <Link to="/" className="an-link">24/7 Customer Service</Link>
@@ -11,4 +11,4 @@ const Abovenav = () => {
   );
 };
 
-export default Abovenav;
+export default AboveNav;

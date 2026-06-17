@@ -10,6 +10,8 @@ const CartContext = createContext({
   setTotal: () => {},
   cartCount: 0,
   setCartCount: () => {},
+  deliveryInfo: {},
+  setDeliveryInfo: () => {},
 });
 
 const CartProvider = ({ children }) => {
@@ -18,6 +20,7 @@ const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [cartCount, setCartCount] = useState(0);
+  const [deliveryInfo, setDeliveryInfo] = useState(null);
 
   const fetchCart = async () => {
     const res = await getCartItemsPreview();
@@ -40,7 +43,7 @@ const CartProvider = ({ children }) => {
   useEffect(() => {
     const fetchCartData = async () => {
       const res = await cartTotal();
-      setCartCount(res.total);
+      setCartCount(res?.total);
     };
 
     fetchCartData();
@@ -54,9 +57,11 @@ const CartProvider = ({ children }) => {
       setTotal,
       cartCount,
       setCartCount,
+      deliveryInfo,
+      setDeliveryInfo,
       refreshCart: fetchCart,
     }),
-    [cart, total, cartCount],
+    [cart, total, cartCount, deliveryInfo],
   );
 
   return (

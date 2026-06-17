@@ -4,11 +4,11 @@ import { addressVerification } from "../utils/regex.js";
 //Shipping
 export const addShippingAddress = async (req, res) => {
   const { userId } = req.user;
-  const { recipient, address_1, address_2, city, state, zipcode } = req.body;
+  const { address_1, address_2, city, state, zipcode } = req.body;
 
   try {
     //Field input validation || Passed ✅
-    if (!recipient || !address_1 || !city || !state || !zipcode) {
+    if (!address_1 || !city || !state || !zipcode) {
       return res
         .status(400)
         .json({ message: "No Shipping information provided" });
@@ -54,7 +54,6 @@ export const addShippingAddress = async (req, res) => {
 
     return res.status(201).json({
       shippingId: newShippingAddress.rows[0].id,
-      recipientName: recipient,
     });
   } catch (error) {
     console.error(error);

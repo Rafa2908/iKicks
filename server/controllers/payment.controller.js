@@ -110,8 +110,6 @@ export const stripeWebhook = async (req, res) => {
             `,
             [orderId],
           );
-
-          return res.status(200).json({ received: true });
         }
       } else {
         await pool.query(
@@ -130,14 +128,15 @@ export const stripeWebhook = async (req, res) => {
           `,
           [orderId],
         );
+      }
 
-        const userResult = await pool.query(
-          `SELECT email FROM users WHERE id=$1`,
-          [userId],
-        );
+      const userResult = await pool.query(
+        `SELECT email FROM users WHERE id=$1`,
+        [userId],
+      );
 
-        const order = await pool.query(
-          `
+      const order = await pool.query(
+        `
           SELECT
             o.id,
             o.recipient_name,
@@ -176,12 +175,11 @@ export const stripeWebhook = async (req, res) => {
           WHERE o.id=$1 AND sa.user_id=$2
           GROUP BY o.id, sa.address_1, sa.address_2, sa.city, sa.state, sa.zipcode
           `,
-          [orderId, userId],
-        );
+        [orderId, userId],
+      );
 
-        if (order.rowCount > 0 && userResult.rowCount > 0) {
-          await sendOrderConfirmation(order.rows[0], userResult.rows[0].email);
-        }
+      if (order.rowCount > 0 && userResult.rowCount > 0) {
+        await sendOrderConfirmation(order.rows[0], userResult.rows[0].email);
       }
 
       break;
@@ -192,22 +190,45 @@ export const stripeWebhook = async (req, res) => {
       const orderId = paymentFail.metadata.order_id;
       const total = paymentFail.amount_received / 100;
 
-      await pool.query(
+      const paymentExist = await pool.query(
         `
+      SELECT id, status FROM transactions
+      WHERE order_id=$1
+      `,
+        [orderId],
+      );
+
+      if (
+        paymentExist.rowCount > 0 &&
+        paymentExist.rows[0].status === "failed"
+      ) {
+        await pool.query(
+          `
+          UPDATE transactions
+          SET status='failed'
+          WHERE id=$1
+          `,
+          [paymentExist.rows[0].id],
+        );
+      } else {
+        await pool.query(
+          `
         INSERT INTO transactions(order_id, payment_id, total_paid, status)
         VALUES($1, $2, $3, 'failed')
         `,
-        [orderId, paymentId, total],
-      );
+          [orderId, paymentId, total],
+        );
 
-      await pool.query(
-        `
+        await pool.query(
+          `
         UPDATE orders
         SET status='failed' 
         WHERE id=$1
         `,
-        [orderId],
-      );
+          [orderId],
+        );
+      }
+
       break;
     }
     default:

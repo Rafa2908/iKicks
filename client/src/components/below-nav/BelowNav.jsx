@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./Belownav.css";
+import "./BelowNav.css";
 
 const categories = [
   "New Arrivals",
@@ -13,7 +13,7 @@ const categories = [
   "On Cloud",
 ];
 
-const Belownav = () => {
+const BelowNav = () => {
   const navigate = useNavigate();
 
   return (
@@ -31,4 +31,4 @@ const Belownav = () => {
   );
 };
 
-export default Belownav;
+export default BelowNav;

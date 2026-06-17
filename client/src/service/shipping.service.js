@@ -16,7 +16,7 @@ export const getAddresses = async () => {
   }
 };
 
-export const addAddress = async (data) => {
+export const addShippingAddress = async (data) => {
   try {
     const res = await shippingInstance.post("/add", data);
     return res.data;

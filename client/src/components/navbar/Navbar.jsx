@@ -1,6 +1,6 @@
 import "./Navbar.css";
-import Abovenav from "../abovenav/Abovenav";
-import Belownav from "../belownav/Belownav";
+import AboveNav from "../above-nav/AboveNav";
+import BelowNav from "../below-nav/BelowNav";
 import Promo from "../promo/Promo";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext, useRef, useEffect } from "react";
@@ -57,7 +57,7 @@ const NavBar = () => {
 
   return (
     <>
-      <Abovenav />
+      <AboveNav />
 
       {loading && (
         <div className="ikicks-spinner-overlay">
@@ -219,7 +219,7 @@ const NavBar = () => {
         </div>
       </nav>
 
-      <Belownav />
+      <BelowNav />
       <Promo />
     </>
   );

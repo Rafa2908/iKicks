@@ -48,7 +48,6 @@ export const decreaseQuantityInCart = async (cartData) => {
 export const getCartItemsPreview = async () => {
   try {
     const res = await cartInstance.get("/preview");
-    console.log(res);
 
     return res.data;
   } catch (error) {

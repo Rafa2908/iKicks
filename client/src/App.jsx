@@ -3,9 +3,9 @@ import NavBar from "./components/navbar/Navbar.jsx";
 import Home from "../src/components/home/Home";
 import Footer from "./components/footer/Footer.jsx";
 import SneakerDisplay from "./components/sneaker-display/SneakerDisplay.jsx";
-import Registration from "./components/reg-log/Registration.jsx";
-import LoginForm from "./components/reg-log/LoginForm.jsx";
-import SneakerByBrand from "./components/sneakerByBrand/SneakerByBrand.jsx";
+import Registration from "./components/auth/Registration.jsx";
+import LoginForm from "./components/auth/LoginForm.jsx";
+import SneakerByBrand from "./components/sneaker-by-brand/SneakerByBrand.jsx";
 import About from "./components/about/About.jsx";
 import Reviews from "./components/reviews/Reviews.jsx";
 import ShippingInfo from "./components/shipping-info/ShippingInfo.jsx";
@@ -24,7 +24,7 @@ import DeliveryInfo from "./components/delivery/DeliveryInfo.jsx";
 import Payment from "./components/payment/Payment.jsx";
 // import UpdateForm from "./components/admin/product-form/UpdateForm.jsx";
 // import Verify from "./components/verify/Verify.jsx";
-// import OrderConfirmation from "./components/orderConfirmation/OrderConfirmation.jsx";
+// import OrderConfirmation from "./components/order-confirmation/OrderConfirmation.jsx";
 
 const App = () => {
   return (
