@@ -15,7 +15,7 @@ export const generateUrl = async (images) => {
       folder: "ikicks/products",
     });
 
-    imageUrl.push(url.secure_url);
+    imageUrl.push(url);
   }
 
   return imageUrl;

@@ -6,7 +6,7 @@ import { sendOrderConfirmation } from "../emails/email.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const makePayment = async (req, res) => {
+export const makePayment = async (req, res, next) => {
   const { userId } = req.user;
   const { orderId } = req.body;
 
@@ -49,9 +49,7 @@ export const makePayment = async (req, res) => {
 
     return res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 

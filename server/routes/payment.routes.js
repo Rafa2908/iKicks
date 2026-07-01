@@ -5,6 +5,8 @@ import { paymentLimiter } from "../utils/rateLimiter.js";
 
 const paymentRouter = Router();
 
-paymentRouter.route("/process").post(authMiddleware, paymentLimiter, makePayment);
+paymentRouter
+  .route("/process")
+  .post(authMiddleware, paymentLimiter, makePayment);
 
 export default paymentRouter;

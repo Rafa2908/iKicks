@@ -15,16 +15,20 @@ import wishlistRouter from "./routes/wishlist.routes.js";
 import invoiceRouter from "./routes/invoice.routes.js";
 import { stripeWebhook } from "./controllers/payment.controller.js";
 import "./utils/ImageUrlGenerator.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import authRouter from "./routes/auth.routes.js";
+
+dotenv.config();
 
 const required = [
-  "JWT_SECRET",
+  "JWT_ACCESS_SECRET",
+  "JWT_REFRESH_SECRET",
   "STRIPE_SECRET_KEY",
   "RESEND_KEY",
   "DBURL",
   "CLOUDINARY_NAME",
   "CLOUDINARY_API_KEY",
   "CLOUDINARY_API_SECRET",
-  "FRONTEND_URL",
 ];
 
 required.forEach((key) => {
@@ -34,34 +38,35 @@ required.forEach((key) => {
   }
 });
 
-dotenv.config();
-
 const app = express();
 
 app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 app.use(helmet());
 app.use(
-  express.json({ limit: "20mb" }),
-  express.urlencoded({ extended: true, limit: "20mb" }),
+  express.json({ limit: "2mb" }),
+  express.urlencoded({ extended: true, limit: "2mb" }),
 );
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    // process.env.FRONTEND_URL ||
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );
 app.set("trust proxy", 1);
 
-app.use("/user", userRouter);
-app.use("/product", productRouter);
-app.use("/cart", cartRouter);
-app.use("/shipping", shippingRouter);
-app.use("/order", orderRouter);
-app.use("/payment", paymentRouter);
-app.use("/wishlist", wishlistRouter);
-app.use("/invoice", invoiceRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/shipping", shippingRouter);
+app.use("/api/order", orderRouter);
+app.use("/api/payment", paymentRouter);
+app.use("/api/wishlist", wishlistRouter);
+app.use("/api/invoice", invoiceRouter);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
 

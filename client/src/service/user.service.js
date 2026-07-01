@@ -1,7 +1,12 @@
 import axios from "axios";
 
 const userInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/user",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/user",
+  withCredentials: true,
+});
+
+const authInstance = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/auth",
   withCredentials: true,
 });
 
@@ -41,9 +46,14 @@ export const getMe = async () => {
 
     return res.data;
   } catch (error) {
-    // 401 is expected when the user is not logged in — don't log it
-    if (error?.response?.status !== 401) {
-      console.error(error.message);
+    if (error?.response?.status === 401) {
+      try {
+        const res = await authInstance.get("/refresh");
+
+        return res.data;
+      } catch (error) {
+        console.error(error);
+      }
     }
     return null;
   }

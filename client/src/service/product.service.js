@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const productInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/product",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/product",
   withCredentials: true,
 });
 

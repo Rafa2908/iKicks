@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const paymentInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/payment",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/payment",
   withCredentials: true,
 });
 

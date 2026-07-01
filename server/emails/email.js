@@ -513,12 +513,12 @@ const OrderConfirmationHtml = (order) => `
 </html>
 `;
 
-export const sendPasswordResetCode = async (code, email) => {
+export const sendPasswordResetCode = async (job) => {
   const { data, error } = await resend.emails.send({
     from: "iKicks <onboarding@resend.dev>",
-    to: [`${email}`],
+    to: [`${job.to}`],
     subject: "Your Temporary password reset code",
-    html: resetPasswordHtml(code),
+    html: resetPasswordHtml(job.data.tempCode),
   });
 
   if (error) {
@@ -526,7 +526,7 @@ export const sendPasswordResetCode = async (code, email) => {
   }
 };
 
-export const sendOrderConfirmation = async (order, email) => {
+export const sendOrderConfirmation = async (job) => {
   const { data, error } = await resend.emails.send({
     from: "iKicks <onboarding@resend.dev>",
     to: [`${email}`],
@@ -535,12 +535,12 @@ export const sendOrderConfirmation = async (order, email) => {
   });
 };
 
-export const sendRegistrationConfirmation = async (name, email) => {
+export const sendRegistrationConfirmation = async (job) => {
   const { data, error } = await resend.emails.send({
     from: "iKicks <onboarding@resend.dev>",
-    to: [`${email}`],
+    to: [`${job.to}`],
     subject: "Welcome to the iKicks family 👟",
-    html: registrationHtml(name),
+    html: registrationHtml(job.data.name),
   });
 
   if (error) {

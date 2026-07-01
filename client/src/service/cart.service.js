@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const cartInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/cart",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/cart",
   withCredentials: true,
 });
 

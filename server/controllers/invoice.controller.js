@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 
-export const generateInvoice = async (req, res) => {
+export const generateInvoice = async (req, res, next) => {
   const { email } = req.user;
   const {
     id,
@@ -683,8 +683,6 @@ export const generateInvoice = async (req, res) => {
     res.set("Content-Type", "application/pdf");
     res.send(pdf);
   } catch (error) {
-    console.error(error.message);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };

@@ -1,6 +1,6 @@
 import pool from "../config/database.js";
 
-export const addToWishlist = async (req, res) => {
+export const addToWishlist = async (req, res, next) => {
   const { userId } = req.user;
   const { productId } = req.body;
 
@@ -51,13 +51,11 @@ export const addToWishlist = async (req, res) => {
       .status(201)
       .json({ message: "Product added to wishlist", wishlisted: true });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const wishlistPreview = async (req, res) => {
+export const wishlistPreview = async (req, res, next) => {
   const { userId } = req.user;
 
   try {
@@ -80,8 +78,6 @@ export const wishlistPreview = async (req, res) => {
 
     return res.status(200).json(wishlistItems.rows);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };

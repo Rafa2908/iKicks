@@ -1,7 +1,7 @@
 import pool from "../config/database.js";
 import { fullNameVerification, phoneVerification } from "../utils/regex.js";
 
-export const placeOrder = async (req, res) => {
+export const placeOrder = async (req, res, next) => {
   const { userId } = req.user;
   const { addressId, recipientName, phoneNumber } = req.body;
   try {
@@ -125,15 +125,13 @@ export const placeOrder = async (req, res) => {
       .status(201)
       .json({ message: "Order processed successfully", orderId });
   } catch (error) {
-    console.error(error);
-
     await pool.query("ROLLBACK");
 
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const getOrderPreview = async (req, res) => {
+export const getOrderPreview = async (req, res, next) => {
   const { userId } = req.user;
 
   try {
@@ -168,13 +166,11 @@ export const getOrderPreview = async (req, res) => {
 
     return res.status(200).json(orders.rows);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const getOrderDetails = async (req, res) => {
+export const getOrderDetails = async (req, res, next) => {
   const { userId } = req.user;
   const { shippingId } = req.params;
 
@@ -227,8 +223,6 @@ export const getOrderDetails = async (req, res) => {
 
     return res.status(200).json(orders.rows);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error)
   }
 };

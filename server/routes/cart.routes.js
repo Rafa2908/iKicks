@@ -28,6 +28,6 @@ cartRouter
   .route("/delete")
   .delete(authMiddleware, updateDataLimiter, deleteCartItem);
 
-cartRouter.route("/clear").delete(authMiddleware, clearCart);
+cartRouter.route("/clear").delete(authMiddleware, updateDataLimiter, clearCart);
 
 export default cartRouter;

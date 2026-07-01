@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const shippingInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/shipping",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/shipping",
   withCredentials: true,
 });
 

@@ -8,7 +8,11 @@ import { getDataLimiter, updateDataLimiter } from "../utils/rateLimiter.js";
 
 const wishlistRouter = Router();
 
-wishlistRouter.route("/add").post(authMiddleware, updateDataLimiter, addToWishlist);
-wishlistRouter.route("/preview").get(authMiddleware, getDataLimiter, wishlistPreview);
+wishlistRouter
+  .route("/add")
+  .post(authMiddleware, updateDataLimiter, addToWishlist);
+wishlistRouter
+  .route("/preview")
+  .get(authMiddleware, getDataLimiter, wishlistPreview);
 
 export default wishlistRouter;

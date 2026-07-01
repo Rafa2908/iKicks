@@ -1,29 +1,18 @@
 import jwt from "jsonwebtoken";
 
 export const authManager = async (req, res, next) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.json({
-      success: false,
-      message: "Access denied. Not authorized",
-    });
-  }
+  const { role } = req?.user;
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (decoded.role !== "admin") {
-      return res.json({
+    if (role !== "admin") {
+      return res.status(403).json({
         success: false,
         message: "Not authorized. Admin only",
       });
     }
 
-    req.user = decoded;
-
     next();
   } catch (error) {
-    return res.json({ success: false, message: error });
+    return res.status(400).json({ success: false, message: "Bad request" });
   }
 };

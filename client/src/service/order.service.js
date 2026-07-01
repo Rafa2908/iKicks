@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const orderInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL + "/order",
+  baseURL: import.meta.env.VITE_BACKEND_URL + "/api/order",
   withCredentials: true,
 });
 

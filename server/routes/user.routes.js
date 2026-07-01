@@ -6,7 +6,6 @@ import {
   generateCode,
   getAllUsers,
   getMe,
-  getUserById,
   loginUser,
   logoutUser,
   registerUser,
@@ -32,13 +31,13 @@ const userRouter = Router();
 userRouter
   .route("/admin")
   .get(authMiddleware, adminDataLimiter, authManager, getAllUsers);
-userRouter.route("/register").post(authLimiter, registerUser);
-userRouter.route("/login").post(authLimiter, loginUser);
-userRouter.route("/logout").post(authLimiter, logoutUser);
+userRouter.route("/register").post(signInLimiter, registerUser);
+userRouter.route("/login").post(signInLimiter, loginUser);
+userRouter.route("/logout").post(authMiddleware, authLimiter, logoutUser);
 userRouter.route("/me").get(authMiddleware, getMe);
 userRouter
   .route("/profile")
-  .get(authMiddleware, getDataLimiter, getUserById)
+  .get(authMiddleware, getDataLimiter, getMe)
   .put(authMiddleware, updateDataLimiter, updateUserInfo);
 userRouter
   .route("/deactivate")

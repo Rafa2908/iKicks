@@ -2,7 +2,7 @@ import pool from "../config/database.js";
 import { addressVerification } from "../utils/regex.js";
 
 //Shipping
-export const addShippingAddress = async (req, res) => {
+export const addShippingAddress = async (req, res, next) => {
   const { userId } = req.user;
   const { address_1, address_2, city, state, zipcode } = req.body;
 
@@ -56,13 +56,11 @@ export const addShippingAddress = async (req, res) => {
       shippingId: newShippingAddress.rows[0].id,
     });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const updateShippingAddress = async (req, res) => {
+export const updateShippingAddress = async (req, res, next) => {
   const { userId } = req.user;
   const { shippingId, address_1, address_2, city, state, zipcode } = req.body;
 
@@ -104,13 +102,11 @@ export const updateShippingAddress = async (req, res) => {
 
     return res.status(200).json({ message: "Shipping address updated" });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const deleteShippingAddress = async (req, res) => {
+export const deleteShippingAddress = async (req, res, next) => {
   const { userId } = req.user;
   const { shippingId } = req.body;
   try {
@@ -139,13 +135,11 @@ export const deleteShippingAddress = async (req, res) => {
 
     return res.status(200).json({ message: "Shipping address deleted" });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const userShippingAddresses = async (req, res) => {
+export const userShippingAddresses = async (req, res, next) => {
   const { userId } = req.user;
 
   try {
@@ -166,8 +160,6 @@ export const userShippingAddresses = async (req, res) => {
 
     return res.status(200).json(addresses.rows);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };

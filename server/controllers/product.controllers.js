@@ -1,4 +1,5 @@
 import pool from "../config/database.js";
+import { v2 as cloudinary } from "cloudinary";
 import { generateUrl } from "../utils/ImageUrlGenerator.js";
 import {
   nameVerification,
@@ -6,17 +7,15 @@ import {
   urlValidation,
 } from "../utils/regex.js";
 
-export const addNewProduct = async (req, res) => {
+export const addNewProduct = async (req, res, next) => {
   const { name, brand, category, description, price, colorway, images, sizes } =
     req.body;
 
+  const imageUrls = [];
+
+  let inTransaction = false;
+
   try {
-    //Upload images to Cloudinary
-    const imageUrls = await generateUrl(images);
-
-    //Database transaction begins
-    await pool.query("BEGIN");
-
     //Data entry validation ||
     if (
       !name ||
@@ -41,6 +40,10 @@ export const addNewProduct = async (req, res) => {
       return res.status(400).json({ message: "Enter a numerical value" });
     }
 
+    if (price <= 0) {
+      return res.status(400).json({ message: "Enter a price greater than 0" });
+    }
+
     //Check if images is an array || Passed ✅
     if (!Array.isArray(images) || images.length === 0) {
       return res.status(400).json({ message: "No image data provided" });
@@ -53,9 +56,11 @@ export const addNewProduct = async (req, res) => {
         .json({ message: "Only 4 pictures allowed per product" });
     }
 
+    imageUrls = await generateUrl(images);
+
     //Validate Cloudinary URLs returned from upload || Passed ✅
     for (const imageUrl of imageUrls) {
-      if (!urlValidation(imageUrl)) {
+      if (!urlValidation(imageUrl.url)) {
         return res
           .status(400)
           .json({ message: "Image upload returned invalid URL" });
@@ -81,25 +86,14 @@ export const addNewProduct = async (req, res) => {
       }
 
       //Check if size is negative or zero || Passed ✅
-      if (size < 0 || size === 0) {
-        return res
-          .status(400)
-          .json({ message: "Size cannot be negative nor zero" });
+      if (size <= 0 || size >= 19) {
+        return res.status(400).json({ message: "Invalid shoe size" });
       }
     }
 
-    const productExist = await pool.query(
-      `
-      SELECT id FROM products
-      WHERE name=$1 AND colorway=$2
-      `,
-      [name, colorway],
-    );
+    await pool.query("BEGIN");
+    inTransaction = true;
 
-    //Checks if product exist before insertion || Passed ✅
-    if (productExist.rowCount > 0) {
-      return res.status(409).json({ message: "Product already exist" });
-    }
     //Insert new product to Products' table
     const newProduct = await pool.query(
       `
@@ -119,7 +113,7 @@ export const addNewProduct = async (req, res) => {
           INSERT INTO product_image(product_id, url, is_primary)
           VALUES($1, $2, $3)
         `,
-        [productId, imageUrls[i], i === 0],
+        [productId, imageUrls[i].url, i === 0],
       );
     }
 
@@ -137,21 +131,44 @@ export const addNewProduct = async (req, res) => {
     //Data is committed to database after successfull insertion
     await pool.query("COMMIT");
 
+    await client.del("products:ikicks");
+
     return res.status(201).json({ message: "New product added" });
   } catch (error) {
-    console.error(error);
+    if (inTransaction) await pool.query("ROLLBACK");
 
-    //If any of the queries fall, the database will
-    //rollback to its original state before insertion
-    await pool.query("ROLLBACK");
+    if (imageUrls && imageUrls.length > 0) {
+      try {
+        for (const image of imageUrls) {
+          await cloudinary.uploader.destroy(image.public_id);
+        }
+      } catch (cleanupError) {
+        console.error(
+          "Failed to clean up orphaned Cloudinary images:",
+          cleanupError,
+        );
+      }
+    }
 
-    return res.status(500).json({ message: "Internal server error" });
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Product already exists" });
+    }
+
+    return next(error);
   }
 };
 
 //Displays products on landing page
-export const getProductsPreview = async (req, res) => {
+export const getProductsPreview = async (req, res, next) => {
   try {
+    const key = "products:ikicks";
+
+    const cache = await client.get(key);
+
+    if (cache) {
+      return res.status(200).json(JSON.parse(cache));
+    }
+
     const products = await pool.query(`
             SELECT p.id, p.name, p.price, pi.url
             FROM products p 
@@ -164,15 +181,15 @@ export const getProductsPreview = async (req, res) => {
       return res.status(404).json({ message: "No products available" });
     }
 
+    await client.set(key, JSON.stringify(products.rows), { EX: 600 });
+
     return res.status(200).json(products.rows);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const getProductInfo = async (req, res) => {
+export const getProductInfo = async (req, res, next) => {
   try {
     const products = await pool.query(`
             SELECT p.id, p.name, p.price, p.brand, p.category, pi.url,
@@ -192,13 +209,11 @@ export const getProductInfo = async (req, res) => {
 
     return res.status(200).json(products.rows);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const getProductDetails = async (req, res) => {
+export const getProductDetails = async (req, res, next) => {
   const { productId } = req.params;
   try {
     if (!productId || isNaN(productId)) {
@@ -240,13 +255,11 @@ export const getProductDetails = async (req, res) => {
 
     return res.status(200).json(product.rows[0]);
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const updateProductById = async (req, res) => {
+export const updateProductById = async (req, res, next) => {
   const {
     id,
     name,
@@ -353,14 +366,13 @@ export const updateProductById = async (req, res) => {
 
     return res.status(200).json({ message: "Product updated" });
   } catch (error) {
-    console.error(error.message);
     await pool.query("ROLLBACK");
 
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const updateQuantityBySize = async (req, res) => {
+export const updateQuantityBySize = async (req, res, next) => {
   const { productId, size, quantity } = req.body;
 
   try {
@@ -396,13 +408,11 @@ export const updateQuantityBySize = async (req, res) => {
 
     return res.status(200).json({ message: "Product updated" });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const updatePriceById = async (req, res) => {
+export const updatePriceById = async (req, res, next) => {
   const { productId, price } = req.body;
 
   try {
@@ -440,13 +450,11 @@ export const updatePriceById = async (req, res) => {
 
     return res.status(200).json({ message: "Price updated" });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const filterProducts = async (req, res) => {
+export const filterProducts = async (req, res, next) => {
   const { name, brand, minPrice, maxPrice, search } = req.query;
 
   try {
@@ -492,8 +500,6 @@ export const filterProducts = async (req, res) => {
 
     return res.status(200).json(products.rows);
   } catch (error) {
-    console.error(error.message);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };

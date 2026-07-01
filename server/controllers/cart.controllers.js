@@ -1,6 +1,6 @@
 import pool from "../config/database.js";
 
-export const addToCart = async (req, res) => {
+export const addToCart = async (req, res, next) => {
   const { userId } = req.user;
   const { productId, size } = req.body;
 
@@ -100,15 +100,13 @@ export const addToCart = async (req, res) => {
 
     return res.status(201).json({ message: "Product added to cart" });
   } catch (error) {
-    console.error(error);
-
     await pool.query("ROLLBACK");
 
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const cartTotal = async (req, res) => {
+export const cartTotal = async (req, res, next) => {
   const { userId } = req.user;
 
   try {
@@ -129,13 +127,11 @@ export const cartTotal = async (req, res) => {
 
     return res.status(200).json(cart.rows[0]);
   } catch (error) {
-    console.error(error.message);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const increaseQuantityInCart = async (req, res) => {
+export const increaseQuantityInCart = async (req, res, next) => {
   const { sizeId } = req.body;
   const { userId } = req.user;
 
@@ -219,15 +215,13 @@ export const increaseQuantityInCart = async (req, res) => {
 
     return res.status(200).json({ message: "Cart updated" });
   } catch (error) {
-    console.error(error);
-
     await pool.query("ROLLBACK");
 
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const decreaseQuantityInCart = async (req, res) => {
+export const decreaseQuantityInCart = async (req, res, next) => {
   const { sizeId } = req.body;
   const { userId } = req.user;
 
@@ -279,13 +273,11 @@ export const decreaseQuantityInCart = async (req, res) => {
 
     return res.status(200).json({ message: "Cart updated" });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const getCartItemsPreview = async (req, res) => {
+export const getCartItemsPreview = async (req, res, next) => {
   const { userId } = req.user;
 
   try {
@@ -344,13 +336,11 @@ export const getCartItemsPreview = async (req, res) => {
       total: cartDetails.rows[0].subtotal,
     });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const deleteCartItem = async (req, res) => {
+export const deleteCartItem = async (req, res, next) => {
   const { userId } = req.user;
   const { sizeId } = req.body;
   try {
@@ -374,13 +364,11 @@ export const deleteCartItem = async (req, res) => {
 
     return res.status(200).json({ message: "Product removed from cart" });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
 
-export const clearCart = async (req, res) => {
+export const clearCart = async (req, res, next) => {
   const { userId } = req.user;
 
   try {
@@ -405,8 +393,6 @@ export const clearCart = async (req, res) => {
 
     return res.status(200).json({ message: "Cart cleared" });
   } catch (error) {
-    console.error(error.message);
-
-    return res.status(500).json({ message: "Internal server error" });
+    return next(error);
   }
 };
