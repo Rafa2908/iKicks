@@ -65,7 +65,6 @@ app.use("/api/shipping", shippingRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/wishlist", wishlistRouter);
-app.use("/api/invoice", invoiceRouter);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;

@@ -11,10 +11,6 @@ export const addNewProduct = async (req, res, next) => {
   const { name, brand, category, description, price, colorway, images, sizes } =
     req.body;
 
-  const imageUrls = [];
-
-  let inTransaction = false;
-
   try {
     //Data entry validation ||
     if (
@@ -56,11 +52,11 @@ export const addNewProduct = async (req, res, next) => {
         .json({ message: "Only 4 pictures allowed per product" });
     }
 
-    imageUrls = await generateUrl(images);
+    const imageUrls = await generateUrl(images);
 
     //Validate Cloudinary URLs returned from upload || Passed ✅
     for (const imageUrl of imageUrls) {
-      if (!urlValidation(imageUrl.url)) {
+      if (!urlValidation(imageUrl)) {
         return res
           .status(400)
           .json({ message: "Image upload returned invalid URL" });
@@ -92,8 +88,20 @@ export const addNewProduct = async (req, res, next) => {
     }
 
     await pool.query("BEGIN");
-    inTransaction = true;
 
+    const productExist = await pool.query(
+      `
+      SELECT id FROM products
+      WHERE name=$1 AND colorway=$2
+      `,
+      [name, colorway],
+    );
+
+    //Checks if product exist before insertion || Passed ✅
+    if (productExist.rowCount > 0) {
+      await pool.query("ROLLBACK");
+      return res.status(409).json({ message: "Product already exist" });
+    }
     //Insert new product to Products' table
     const newProduct = await pool.query(
       `
@@ -113,7 +121,7 @@ export const addNewProduct = async (req, res, next) => {
           INSERT INTO product_image(product_id, url, is_primary)
           VALUES($1, $2, $3)
         `,
-        [productId, imageUrls[i].url, i === 0],
+        [productId, imageUrls[i], i === 0],
       );
     }
 
@@ -135,24 +143,9 @@ export const addNewProduct = async (req, res, next) => {
 
     return res.status(201).json({ message: "New product added" });
   } catch (error) {
-    if (inTransaction) await pool.query("ROLLBACK");
-
-    if (imageUrls && imageUrls.length > 0) {
-      try {
-        for (const image of imageUrls) {
-          await cloudinary.uploader.destroy(image.public_id);
-        }
-      } catch (cleanupError) {
-        console.error(
-          "Failed to clean up orphaned Cloudinary images:",
-          cleanupError,
-        );
-      }
-    }
-
-    if (error.code === "23505") {
-      return res.status(409).json({ message: "Product already exists" });
-    }
+    //If any of the queries fall, the database will
+    //rollback to its original state before insertion
+    await pool.query("ROLLBACK");
 
     return next(error);
   }

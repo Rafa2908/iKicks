@@ -529,10 +529,19 @@ export const sendPasswordResetCode = async (job) => {
 export const sendOrderConfirmation = async (job) => {
   const { data, error } = await resend.emails.send({
     from: "iKicks <onboarding@resend.dev>",
-    to: [`${email}`],
+    to: [`${job.to}`],
     subject: "Order Confirmation",
-    html: OrderConfirmationHtml(order),
+    html: OrderConfirmationHtml(job.data.order),
+    attachments: [
+      {
+        filename: `invoice-${job.data.order.id}.pdf`,
+        content: Buffer.from(job.data.invoice, "base64"),
+        contentType: "application/pdf",
+      },
+    ],
   });
+  if (error)
+    throw new Error(`Failed to send order confirmation: ${error.message}`);
 };
 
 export const sendRegistrationConfirmation = async (job) => {
