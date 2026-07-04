@@ -2,17 +2,18 @@ import { client } from "../utils/redisClient.js";
 import { sendOrderConfirmation, sendPasswordResetCode, sendRegistrationConfirmation } from "./email.js";
 
 
-const emailProcessor = () => {
-  while(true){
+export const emailProcessor = async () => {
+  while (true) {
     const job = await client.brPop("queue:email", 0);
-    
-    process(JSON.parse(job.element))
-  }
-}
 
-const process = async (job) => {
+    processJob(JSON.parse(job.element));
+  }
+};
+
+const processJob = async (job) => {
   switch (job.type) {
     case "register":
+          console.log("email sent")
           await sendRegistrationConfirmation(job);
       break;
     

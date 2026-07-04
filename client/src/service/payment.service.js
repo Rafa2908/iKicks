@@ -13,3 +13,33 @@ export const makePayment = async (orderId) => {
     console.error(error.message);
   }
 };
+
+export const cashPayment = async ({ orderId }) => {
+  try {
+    const res = await paymentInstance.post("/cash", orderId);
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const bankTransferPayment = async ({ orderId }) => {
+  try {
+    const res = await paymentInstance.post("/bank", orderId);
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updatePayment = async (orderData) => {
+  try {
+    const res = await paymentInstance.post("/method/update", orderData);
+
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};

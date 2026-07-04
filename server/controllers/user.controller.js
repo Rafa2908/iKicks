@@ -94,7 +94,17 @@ export const registerUser = async (req, res, next) => {
       }),
     );
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
+      {
+        userId: newUser.rows[0].id,
+        email: newUser.rows[0].email,
+        role: newUser.rows[0].role,
+      },
+      process.env.JWT_ACCESS_SECRET,
+      { expiresIn: "15m" },
+    );
+
+    const refreshToken = jwt.sign(
       {
         userId: newUser.rows[0].id,
         email: newUser.rows[0].email,
@@ -104,10 +114,21 @@ export const registerUser = async (req, res, next) => {
       { expiresIn: "7d" },
     );
 
-    res.cookie("token", token, {
+    await client.set(`refresh:${newUser.rows[0].id}`, refreshToken, {
+      EX: 604800,
+    });
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV ? "none" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

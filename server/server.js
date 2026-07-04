@@ -1,20 +1,20 @@
 import express from "express";
 import dotenv from "dotenv";
+import "./emails/email.js";
+import { emailProcessor } from "./emails/emailProcessor.js";
+import "./config/database.js";
+import "./utils/ImageUrlGenerator.js";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-import "./config/database.js";
 import userRouter from "./routes/user.routes.js";
 import productRouter from "./routes/product.routes.js";
-import "./emails/email.js";
 import cartRouter from "./routes/cart.routes.js";
 import shippingRouter from "./routes/shipping.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import wishlistRouter from "./routes/wishlist.routes.js";
-import invoiceRouter from "./routes/invoice.routes.js";
 import { stripeWebhook } from "./controllers/payment.controller.js";
-import "./utils/ImageUrlGenerator.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.routes.js";
 
@@ -42,7 +42,19 @@ const app = express();
 
 app.post("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "js.stripe.com"],
+        frameSrc: ["'self'", "js.stripe.com"],
+        connectSrc: ["'self'", "api.stripe.com"],
+        imgSrc: ["'self'", "res.cloudinary.com", "data:"],
+      },
+    },
+  }),
+);
 app.use(
   express.json({ limit: "2mb" }),
   express.urlencoded({ extended: true, limit: "2mb" }),
@@ -70,3 +82,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
+
+emailProcessor().catch((err) => console.error("Email processor crashed:", err));

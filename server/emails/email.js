@@ -555,6 +555,4 @@ export const sendRegistrationConfirmation = async (job) => {
   if (error) {
     return console.error({ error });
   }
-
-  console.log({ data });
 };

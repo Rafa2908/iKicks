@@ -2,7 +2,11 @@ import { useState, useContext } from "react";
 import "./Payment.css";
 import { CartContext } from "../../context/CartContext";
 import { placeOrder } from "../../service/order.service";
-import { makePayment } from "../../service/payment.service";
+import {
+  bankTransferPayment,
+  cashPayment,
+  makePayment,
+} from "../../service/payment.service";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -10,6 +14,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { useNavigate } from "react-router-dom";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -55,6 +60,7 @@ const CARD_ELEMENT_OPTIONS = {
 
 const PaymentForm = () => {
   const { cart, total, deliveryInfo } = useContext(CartContext);
+  const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
 
@@ -74,12 +80,50 @@ const PaymentForm = () => {
   const visibleItems = showAll ? items : items.slice(0, VISIBLE_LIMIT);
   const hiddenCount = items.length - VISIBLE_LIMIT;
 
-  const handleCashOrder = async () => {
-    // TODO: implement cash reservation order logic
+  const handleCashOrder = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setPaymentError(null);
+
+    const cashOrder = await placeOrder(deliveryInfo);
+    if (!cashOrder?.orderId) {
+      setPaymentError("Failed to place order. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    const payment = await cashPayment(cashOrder.orderId);
+
+    if (!payment.success) {
+      setPaymentError("Payment initialization failed. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    navigate("/order/confirmation");
   };
 
-  const handleBankTransfer = async () => {
-    // TODO: implement bank transfer order logic
+  const handleBankTransfer = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setPaymentError(null);
+
+    const bankOrder = await placeOrder(deliveryInfo);
+    if (!bankOrder?.orderId) {
+      setPaymentError("Failed to place order. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    const payment = await bankTransferPayment(bankOrder.orderId);
+
+    if (!payment.success) {
+      setPaymentError("Payment initialization failed. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    navigate("/order/confirmation");
   };
 
   const handleCopy = (text, bankId) => {
@@ -354,9 +398,7 @@ const PaymentForm = () => {
                   </div>
                 </div>
 
-                {paymentError && (
-                  <p className="ck-error">{paymentError}</p>
-                )}
+                {paymentError && <p className="ck-error">{paymentError}</p>}
 
                 <button
                   type="submit"

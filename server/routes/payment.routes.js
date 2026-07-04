@@ -7,6 +7,7 @@ import {
   updatePayment,
 } from "../controllers/payment.controller.js";
 import { paymentLimiter } from "../utils/rateLimiter.js";
+import { authManager } from "../middleware/admin.js";
 
 const paymentRouter = Router();
 
@@ -22,6 +23,6 @@ paymentRouter
 
 paymentRouter
   .route("/method/update")
-  .patch(authMiddleware, paymentLimiter, updatePayment);
+  .patch(authMiddleware, authManager, paymentLimiter, updatePayment);
 
 export default paymentRouter;

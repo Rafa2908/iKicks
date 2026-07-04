@@ -1,4 +1,5 @@
 import pool from "../config/database.js";
+import { addHours } from "../utils/dateFormat.js";
 import { addressVerification } from "../utils/regex.js";
 
 //Shipping
@@ -161,5 +162,54 @@ export const userShippingAddresses = async (req, res, next) => {
     return res.status(200).json(addresses.rows);
   } catch (error) {
     return next(error);
+  }
+};
+
+export const createShippingOrder = async (req, res, next) => {
+  const { orderId } = req.body;
+
+  if (!orderId) {
+    return res.status(400).json({ message: "No order data provided" });
+  }
+
+  const orderPlacedDate = new Date();
+  const tentativeShipDate = addHours(orderPlacedDate, 120); // 5 days
+  const tentativeDeliveryDate = addHours(tentativeShipDate, 72); // 3 days
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const orderInfo = await client.query(
+      `SELECT shipping_address_id FROM orders WHERE id = $1`,
+      [orderId],
+    );
+
+    if (orderInfo.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const shippingId = orderInfo.rows[0].shipping_address_id;
+
+    const shippingOrder = await client.query(
+      `INSERT INTO shipping_orders(order_id, shipping_address_id, ship_date, delivery_date)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [orderId, shippingId, tentativeShipDate, tentativeDeliveryDate],
+    );
+
+    await client.query("COMMIT");
+
+    return res.status(201).json({
+      message: "Shipping order created successfully",
+      shippingOrder: shippingOrder.rows[0],
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    return next(error);
+  } finally {
+    client.release();
   }
 };

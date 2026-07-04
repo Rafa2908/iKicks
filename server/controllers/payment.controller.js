@@ -1,9 +1,9 @@
 import pool from "../config/database.js";
 import Stripe from "stripe";
 import "dotenv/config";
-import { generateInvoice } from "./invoice.controller.js";
 import { sendOrderConfirmation } from "../emails/email.js";
 import { client } from "../utils/redisClient.js";
+import { generateInvoice } from "../utils/invoiceGenerator.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -499,5 +499,3 @@ export const updatePayment = async (req, res, next) => {
     return next(error);
   }
 };
-
-

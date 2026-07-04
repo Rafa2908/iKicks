@@ -1,4 +1,6 @@
 import "dotenv/config";
+import jwt from "jsonwebtoken";
+import { client } from "../utils/redisClient.js";
 
 export const tokenRefresh = async (req, res) => {
   const { refreshToken } = req.cookies;
@@ -26,7 +28,7 @@ export const tokenRefresh = async (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV ? "none" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 15 * 60 * 1000,
     });
 

@@ -22,9 +22,9 @@ import Profile from "./components/profile/Profile.jsx";
 import ResetPassword from "./components/reset-password/ResetPassword.jsx";
 import DeliveryInfo from "./components/delivery/DeliveryInfo.jsx";
 import Payment from "./components/payment/Payment.jsx";
+import OrderConfirmation from "./components/order-confirmation/OrderConfirmation.jsx";
 // import UpdateForm from "./components/admin/product-form/UpdateForm.jsx";
 // import Verify from "./components/verify/Verify.jsx";
-// import OrderConfirmation from "./components/order-confirmation/OrderConfirmation.jsx";
 
 const App = () => {
   return (
@@ -52,6 +52,7 @@ const App = () => {
         <Route path={"/reset-password"} element={<ResetPassword />} />
         <Route path={"/delivery"} element={<DeliveryInfo />} />
         <Route path={"/payment"} element={<Payment />} />
+        <Route path={"/order/confirmation"} element={<OrderConfirmation />} />
         {/*
         
         
@@ -60,7 +61,7 @@ const App = () => {
         
         
         <Route path={"/verify"} element={<Verify />} />
-        <Route path={"/confirmation"} element={<OrderConfirmation />} />
+        
          */}
       </Routes>
       <Footer />

@@ -2,6 +2,7 @@ import { Router } from "express";
 import authMiddleware from "../middleware/auth.js";
 import {
   addShippingAddress,
+  createShippingOrder,
   deleteShippingAddress,
   updateShippingAddress,
   userShippingAddresses,
@@ -22,5 +23,9 @@ shippingRouter
 shippingRouter
   .route("/delete")
   .delete(authMiddleware, updateDataLimiter, deleteShippingAddress);
+
+shippingRouter
+  .route("/create")
+  .post(authMiddleware, updateDataLimiter, createShippingOrder);
 
 export default shippingRouter;

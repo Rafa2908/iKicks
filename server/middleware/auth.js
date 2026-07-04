@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-import { client } from "../utils/redisClient";
+import { client } from "../utils/redisClient.js";
 
 const authMiddleware = async (req, res, next) => {
   const { accessToken, refreshToken } = req.cookies;
@@ -37,7 +37,7 @@ const authMiddleware = async (req, res, next) => {
     const newAccessToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email, role: decoded.role },
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: "1m" },
     );
 
     res.cookie("accessToken", newAccessToken, {
@@ -46,6 +46,7 @@ const authMiddleware = async (req, res, next) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 15 * 60 * 1000,
     });
+    console.log("token refreshed");
 
     req.user = decoded;
     return next();

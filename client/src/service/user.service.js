@@ -48,9 +48,10 @@ export const getMe = async () => {
   } catch (error) {
     if (error?.response?.status === 401) {
       try {
-        const res = await authInstance.get("/refresh");
+        await authInstance.post("/refresh");
+        const retryRes = await userInstance.get("/me");
 
-        return res.data;
+        return retryRes.data;
       } catch (error) {
         console.error(error);
       }
