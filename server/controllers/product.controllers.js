@@ -6,6 +6,7 @@ import {
   productNameVerification,
   urlValidation,
 } from "../utils/regex.js";
+import { client } from "../utils/redisClient.js";
 
 export const addNewProduct = async (req, res, next) => {
   const { name, brand, category, description, price, colorway, images, sizes } =

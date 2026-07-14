@@ -382,10 +382,13 @@ export const clearCart = async (req, res, next) => {
 
     const cartId = cart.rows[0].id;
 
-    const clear = await pool.query(`
+    const clear = await pool.query(
+      `
             DELETE FROM cart_items
             WHERE cart_id=$1 RETURNING id
-            `);
+            `,
+      [cartId],
+    );
 
     if (clear.rowCount === 0) {
       return res.status(404).json({ message: "Cart not found" });

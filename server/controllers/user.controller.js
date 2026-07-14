@@ -390,7 +390,7 @@ export const deactivateUserAccount = async (req, res, next) => {
   }
 };
 
-export const generateCode = async (req, res) => {
+export const generateCode = async (req, res, next) => {
   const { email } = req.body;
 
   try {
@@ -408,6 +408,10 @@ export const generateCode = async (req, res) => {
       `,
       [email],
     );
+
+    if (user.rowCount === 0) {
+      return res.status(404).json("Unable to proceed with request");
+    }
 
     const userId = user.rows[0].id;
 
@@ -445,7 +449,7 @@ export const generateCode = async (req, res) => {
   }
 };
 
-export const verifyCode = async (req, res) => {
+export const verifyCode = async (req, res, next) => {
   const { userId, resetCode } = req.body;
 
   try {
@@ -504,7 +508,7 @@ export const verifyCode = async (req, res) => {
   }
 };
 
-export const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res, next) => {
   const { resetToken } = req.cookies;
   const { newPassword, confirmPassword } = req.body;
 

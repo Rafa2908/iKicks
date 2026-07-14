@@ -358,7 +358,7 @@ export const cashPayment = async (req, res, next) => {
 };
 
 export const bankTransferPayment = async (req, res, next) => {
-  const { userId } = req.user;
+  const { userId, email } = req.user;
   const { orderId } = req.body;
   const paymentId = crypto.randomUUID();
   let inTransaction = false;
