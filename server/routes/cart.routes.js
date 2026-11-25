@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authMiddleware from "../middleware/auth.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   addToCart,
   cartTotal,
@@ -10,10 +11,28 @@ import {
   increaseQuantityInCart,
 } from "../controllers/cart.controllers.js";
 import { getDataLimiter, updateDataLimiter } from "../utils/rateLimiter.js";
+import {
+  positiveInt,
+  positiveNumber,
+  required,
+  validate,
+} from "../utils/validator.js";
+
+const addToCartRules = {
+  productId: [required, positiveInt],
+  size: [required, positiveNumber],
+};
 
 const cartRouter = Router();
 
-cartRouter.route("/add").post(authMiddleware, updateDataLimiter, addToCart);
+cartRouter
+  .route("/add")
+  .post(
+    authMiddleware,
+    updateDataLimiter,
+    validate(addToCartRules),
+    asyncHandler(addToCart),
+  );
 cartRouter.route("/count").get(authMiddleware, getDataLimiter, cartTotal);
 cartRouter
   .route("/increase")

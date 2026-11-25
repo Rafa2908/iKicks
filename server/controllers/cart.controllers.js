@@ -1,39 +1,31 @@
 import pool from "../config/database.js";
+import { HttpError } from "../utils/httpError.js";
 
 export const addToCart = async (req, res, next) => {
   const { userId } = req.user;
   const { productId, size } = req.body;
 
+  const client = await pool.connect();
+  let inTransaction = false;
+
   try {
-    await pool.query("BEGIN");
+    await client.query("BEGIN");
+    inTransaction = true;
 
-    //Checks if data is provided || Passed ✅
-    if (!productId || !size) {
-      return res.status(400).json({ message: "No data provided" });
-    }
-
-    //Checks if data provided is valid || Passed ✅
-    if (!Number.isFinite(productId) || !Number.isFinite(size)) {
-      return res.status(400).json({ message: "Invalid data provided" });
-    }
-
-    //Checks if user cart exist
-    const userCart = await pool.query(
+    const userCart = await client.query(
       `
       SELECT id FROM cart WHERE user_id=$1
       `,
       [userId],
     );
 
-    //If user cart doesn't exist, error message is displayed
     if (userCart.rowCount === 0) {
-      return res.status(404).json({ message: "Cart not found" });
+      throw new HttpError(404, "Cart not found");
     }
 
     const cartId = userCart.rows[0].id;
 
-    //Query products' data
-    const product = await pool.query(
+    const product = await client.query(
       `
       SELECT ps.id as size_id, p.price, ps.quantity
       FROM product_size ps
@@ -44,20 +36,17 @@ export const addToCart = async (req, res, next) => {
       [productId, size],
     );
 
-    //Checks if product and size exist
     if (product.rowCount === 0) {
-      return res.status(400).json({ message: "Product size not available" });
+      throw new HttpError(400, "Product size not available");
     }
 
-    //Checks if product's quantity is nonnegative or zero
     if (product.rows[0].quantity <= 0) {
-      return res.status(400).json({ message: "Product is out of stock" });
+      throw new HttpError(400, "Product is out of stock");
     }
 
     const sizeId = product.rows[0].size_id;
 
-    //Checks if user already added items to the cart
-    const cartItems = await pool.query(
+    const cartItems = await client.query(
       `
       SELECT quantity FROM cart_items
       WHERE cart_id=$1 AND size_id=$2
@@ -66,14 +55,11 @@ export const addToCart = async (req, res, next) => {
       [cartId, sizeId],
     );
 
-    //If items were already added, certain conditions will be checked
     if (cartItems.rowCount > 0) {
-      //If quantity in cart + 1 is greater than current stock, error message will display
       if (cartItems.rows[0].quantity + 1 > product.rows[0].quantity) {
-        return res.status(400).json({ message: "Cannot add more to the cart" });
+        throw new HttpError(400, "Cannot add more to the cart");
       } else {
-        //Product quantity will be updated to quantity+1
-        await pool.query(
+        await client.query(
           `
           UPDATE cart_items
           SET quantity=quantity+1
@@ -82,13 +68,14 @@ export const addToCart = async (req, res, next) => {
           [cartId, sizeId],
         );
 
-        await pool.query("COMMIT");
+        await client.query("COMMIT");
+        inTransaction = false;
 
         return res.status(200).json({ message: "Cart updated" });
       }
     }
 
-    const cart = await pool.query(
+    await client.query(
       `
       INSERT INTO cart_items(cart_id, size_id, price_at_add, quantity)
       VALUES($1, $2, $3, 1)
@@ -96,13 +83,17 @@ export const addToCart = async (req, res, next) => {
       [cartId, sizeId, product.rows[0].price],
     );
 
-    await pool.query("COMMIT");
+    await client.query("COMMIT");
+    inTransaction = false;
 
     return res.status(201).json({ message: "Product added to cart" });
   } catch (error) {
-    await pool.query("ROLLBACK");
-
+    if (inTransaction) {
+      await client.query("ROLLBACK");
+    }
     return next(error);
+  } finally {
+    client.release();
   }
 };
 
